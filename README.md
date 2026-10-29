@@ -13,7 +13,7 @@ Kräver Android 8.0 (API 26) eller senare.
 
 Ovanför knappsatsen finns en lägesväljare med två segment: **Internt | Patient**.
 Det valda läget fylls med lägets färg (grönt respektive lila) och appen minns ditt val.
-Under knappsatsen finns en enda stor ringknapp och till höger om den backstegsknappen
+Under knappsatsen finns en enda stor ringknapp och till vänster om den backstegsknappen
 (tryck = radera en siffra, håll in = rensa fältet).
 
 - **Tomt nummerfält:** knappen heter **RING VÄXELN**, är blå och ringer växelnumret utan prefix
