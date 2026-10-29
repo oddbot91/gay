@@ -54,7 +54,24 @@
             android:id="@+id/edit_private_number"
             style="@style/DialogField"
             android:hint="@string/hint_private_number"
-            android:imeOptions="actionDone"
+            android:imeOptions="actionNext"
             android:inputType="phone" />
+
+        <TextView
+            style="@style/DialogLabel"
+            android:labelFor="@+id/edit_category"
+            android:text="@string/label_category" />
+
+        <Spinner
+            android:id="@+id/edit_category"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+        <CheckBox
+            android:id="@+id/edit_favorite"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/space_small"
+            android:text="@string/label_favorite" />
     </LinearLayout>
 </ScrollView>

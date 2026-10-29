@@ -14,6 +14,7 @@ final class Prefs {
     static final String KEY_CONTACT_SORT = "contact_sort";
     static final String KEY_HIDE_IN_CALL_LOG = "hide_in_call_log";
     static final String KEY_CALL_LOG_PROMPT_SHOWN = "call_log_prompt_shown";
+    static final String KEY_DIAL_MODE = "dial_mode";
     static final String KEY_PENDING_CLEANUP = "pending_cleanup_json";
 
     static final String DEFAULT_PREFIX_INTERNAL = "03134";
@@ -70,6 +71,19 @@ final class Prefs {
     void setContactSort(ContactStore.SortMode mode) {
         if (mode != null) {
             sp.edit().putString(KEY_CONTACT_SORT, mode.name()).apply();
+        }
+    }
+
+    // ------------------------------------------------------------------ dial mode
+
+    /** Selected mode of the dial pane; INTERNAL, PATIENT or SWITCHBOARD (never PRIVATE). */
+    Dialer.CallMode getDialMode() {
+        return Dialer.parseDialMode(getString(KEY_DIAL_MODE, null));
+    }
+
+    void setDialMode(Dialer.CallMode mode) {
+        if (mode != null && mode != Dialer.CallMode.PRIVATE) {
+            sp.edit().putString(KEY_DIAL_MODE, mode.name()).apply();
         }
     }
 

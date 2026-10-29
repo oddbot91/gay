@@ -20,10 +20,8 @@
     <string name="cd_key_hash">Fyrkant</string>
     <string name="call_internal">RING INTERNT</string>
     <string name="call_patient">RING PATIENT</string>
-    <string name="call_patient_sub">dolt nummer</string>
     <string name="call_switchboard">RING VÄXELN</string>
     <string name="switchboard_not_set">inget nummer inställt</string>
-    <string name="preview_format">Internt → %1$s · Patient → %2$s</string>
     <string name="match_work">%1$s · Jobb %2$s</string>
     <string name="match_private">%1$s · Privat %2$s</string>
 

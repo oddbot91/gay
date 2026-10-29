@@ -6,6 +6,10 @@
         android:showAsAction="never"
         android:title="@string/menu_settings" />
     <item
+        android:id="@+id/action_categories"
+        android:showAsAction="never"
+        android:title="@string/menu_categories" />
+    <item
         android:id="@+id/action_export"
         android:showAsAction="never"
         android:title="@string/menu_export" />

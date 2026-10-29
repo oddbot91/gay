@@ -34,8 +34,8 @@
     <color name="tab_unselected">#FF6B6B6B</color>
 
     <!-- Call mode colours (recents icons, contact row icons). -->
-    <color name="mode_internal">#FF1565C0</color>
+    <color name="mode_internal">#FF2E7D32</color>
     <color name="mode_patient">#FF6A1B9A</color>
-    <color name="mode_switchboard">#FF2E7D32</color>
+    <color name="mode_switchboard">#FF1565C0</color>
     <color name="mode_private">#FFE65100</color>
 </resources>

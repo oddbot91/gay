@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Group header of the contacts list: chevron (or star), bold title, count on the right. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
+    android:gravity="center_vertical"
+    android:minHeight="@dimen/group_header_min_height"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/row_padding_h"
+    android:paddingRight="@dimen/row_padding_h">
+
+    <ImageView
+        android:id="@+id/header_chevron"
+        android:layout_width="@dimen/group_header_icon_size"
+        android:layout_height="@dimen/group_header_icon_size"
+        android:layout_marginEnd="@dimen/space_small"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_chevron"
+        android:tint="?android:attr/textColorSecondary" />
+
+    <TextView
+        android:id="@+id/header_title"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="@dimen/group_header_text_size"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/header_count"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="@dimen/space_small"
+        android:gravity="end"
+        android:maxLines="1"
+        android:textColor="?android:attr/textColorSecondary"
+        android:textSize="@dimen/group_header_count_text_size" />
+</LinearLayout>

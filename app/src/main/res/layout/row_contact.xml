@@ -4,23 +4,40 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:paddingLeft="@dimen/row_padding_h"
+    android:paddingLeft="@dimen/contact_row_padding_start"
     android:paddingTop="@dimen/row_padding_v"
     android:paddingRight="@dimen/row_padding_h"
     android:paddingBottom="@dimen/row_padding_v">
 
-    <TextView
-        android:id="@+id/contact_name"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
         android:paddingLeft="@dimen/space_tiny"
         android:paddingRight="@dimen/space_tiny"
-        android:paddingBottom="@dimen/space_tiny"
-        android:maxLines="1"
-        android:ellipsize="end"
-        android:textColor="?android:attr/textColorPrimary"
-        android:textSize="@dimen/contact_name_text_size"
-        android:textStyle="bold" />
+        android:paddingBottom="@dimen/space_tiny">
+
+        <TextView
+            android:id="@+id/contact_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="@dimen/contact_name_text_size"
+            android:textStyle="bold" />
+
+        <ImageView
+            android:id="@+id/favorite_star"
+            android:layout_width="@dimen/favorite_star_size"
+            android:layout_height="@dimen/favorite_star_size"
+            android:layout_marginStart="@dimen/space_small"
+            android:contentDescription="@string/cd_favorite"
+            android:src="@drawable/ic_star"
+            android:tint="@color/accent"
+            android:visibility="gone" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/work_row"

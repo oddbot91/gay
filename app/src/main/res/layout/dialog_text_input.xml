@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Small one-line input dialog body (new category). -->
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:paddingLeft="@dimen/dialog_padding_h"
+    android:paddingTop="@dimen/space_small"
+    android:paddingRight="@dimen/dialog_padding_h">
+
+    <EditText
+        android:id="@+id/text_input"
+        style="@style/DialogField"
+        android:hint="@string/hint_category_name"
+        android:imeOptions="actionDone"
+        android:inputType="textCapSentences" />
+</FrameLayout>

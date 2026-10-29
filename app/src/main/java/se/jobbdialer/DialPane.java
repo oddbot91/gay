@@ -1,5 +1,7 @@
 package se.jobbdialer;
 
+import android.content.res.ColorStateList;
+import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.HapticFeedbackConstants;
@@ -7,16 +9,20 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
- * "Ring" pane: number field with the app's own keypad, live preview of the dialed numbers,
- * up to three matching contacts and the three call buttons. Placing the call (and recording
- * it in the history / call log cleanup) is done by {@link Dialer}.
+ * "Ring" pane: number field with the app's own keypad (with T9 letters), up to four matching
+ * contacts (number or T9 name match), a mode selector (Internt / Patient / Växeln) and a single
+ * call button. Placing the call (and recording it in the history / call log cleanup) is done
+ * by {@link Dialer}.
  */
 final class DialPane {
 
-    private static final int MAX_MATCHES = 3;
+    private static final int MAX_MATCHES = 4;
 
     private static final int[] DIGIT_KEY_IDS = {
             R.id.key_0, R.id.key_1, R.id.key_2, R.id.key_3, R.id.key_4,
@@ -24,23 +30,43 @@ final class DialPane {
 
     private final MainActivity activity;
     private final EditText numberField;
-    private final TextView preview;
     private final TextView[] matchRows;
-    private final View callInternal;
-    private final View callPatient;
-    private final TextView switchboardSub;
+    private final TextView[] segments;
+    private final Dialer.CallMode[] segmentModes = {
+            Dialer.CallMode.INTERNAL, Dialer.CallMode.PATIENT, Dialer.CallMode.SWITCHBOARD};
+    private final View callButton;
+    private final TextView callTitle;
+    private final TextView callSub;
+    private Dialer.CallMode mode;
 
     DialPane(MainActivity activity, View root) {
         this.activity = activity;
         numberField = root.findViewById(R.id.number_field);
-        preview = root.findViewById(R.id.preview);
         matchRows = new TextView[]{
                 root.findViewById(R.id.match_1),
                 root.findViewById(R.id.match_2),
-                root.findViewById(R.id.match_3)};
-        callInternal = root.findViewById(R.id.call_internal);
-        callPatient = root.findViewById(R.id.call_patient);
-        switchboardSub = root.findViewById(R.id.switchboard_sub);
+                root.findViewById(R.id.match_3),
+                root.findViewById(R.id.match_4)};
+        segments = new TextView[]{
+                root.findViewById(R.id.seg_internal),
+                root.findViewById(R.id.seg_patient),
+                root.findViewById(R.id.seg_switchboard)};
+        callButton = root.findViewById(R.id.call_button);
+        callTitle = root.findViewById(R.id.call_title);
+        callSub = root.findViewById(R.id.call_sub);
+        mode = activity.getPrefs().getDialMode();
+
+        for (int i = 0; i < segments.length; i++) {
+            final Dialer.CallMode m = segmentModes[i];
+            segments[i].setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mode = m;
+                    activity.getPrefs().setDialMode(m);
+                    updateForInput();
+                }
+            });
+        }
 
         // Own keypad: never pop up the soft keyboard, but keep cursor / paste working.
         numberField.setShowSoftInputOnFocus(false);
@@ -88,34 +114,23 @@ final class DialPane {
             }
         });
 
-        callInternal.setOnClickListener(new View.OnClickListener() {
+        callButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                activity.getDialer().call(Dialer.CallMode.INTERNAL, input(), null);
-            }
-        });
-        callPatient.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activity.getDialer().call(Dialer.CallMode.PATIENT, input(), null);
-            }
-        });
-        root.findViewById(R.id.call_switchboard).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                activity.getDialer().callSwitchboard();
+                if (mode == Dialer.CallMode.SWITCHBOARD) {
+                    activity.getDialer().callSwitchboard();
+                } else {
+                    activity.getDialer().call(mode, input(), null);
+                }
             }
         });
 
         refresh();
     }
 
-    /** Re-reads settings (prefixes, switchboard) and contacts. */
+    /** Re-reads settings (prefixes, switchboard, mode) and contacts. */
     void refresh() {
-        String sb = Numbers.clean(activity.getPrefs().getSwitchboardNumber());
-        switchboardSub.setText(sb.isEmpty()
-                ? activity.getString(R.string.switchboard_not_set)
-                : Numbers.formatForDisplay(sb));
+        mode = activity.getPrefs().getDialMode();
         updateForInput();
     }
 
@@ -173,24 +188,76 @@ final class DialPane {
 
     private void updateForInput() {
         String raw = Numbers.clean(input());
-        boolean empty = raw.isEmpty();
-        callInternal.setEnabled(!empty);
-        callPatient.setEnabled(!empty);
-
-        Prefs prefs = activity.getPrefs();
-        if (empty) {
-            preview.setVisibility(View.GONE);
-        } else {
-            preview.setText(activity.getString(R.string.preview_format,
-                    Numbers.previewWithPrefix(prefs.getPrefixInternal(), raw, true),
-                    Numbers.previewWithPrefix(prefs.getPrefixPatient(), raw)));
-            preview.setVisibility(View.VISIBLE);
-        }
+        updateModeAndCallButton(raw);
         updateMatches(raw);
     }
 
+    /** Tints the mode selector and the call button and sets the call button texts. */
+    private void updateModeAndCallButton(String raw) {
+        for (int i = 0; i < segments.length; i++) {
+            int color = activity.getColor(segmentModes[i].colorResId);
+            boolean selected = segmentModes[i] == mode;
+            segments[i].setBackgroundTintList(ColorStateList.valueOf(selected ? color : Color.TRANSPARENT));
+            segments[i].setTextColor(selected ? Color.WHITE : color);
+        }
+
+        Prefs prefs = activity.getPrefs();
+        boolean enabled;
+        String sub;
+        int titleRes;
+        if (mode == Dialer.CallMode.SWITCHBOARD) {
+            titleRes = R.string.call_switchboard;
+            String sb = Dialer.buildNumber(prefs, mode, null);
+            sub = sb.isEmpty() ? activity.getString(R.string.switchboard_not_set) : Numbers.formatForDisplay(sb);
+            enabled = true;
+        } else {
+            titleRes = mode == Dialer.CallMode.PATIENT ? R.string.call_patient : R.string.call_internal;
+            enabled = !raw.isEmpty();
+            sub = enabled
+                    ? Numbers.formatForDisplay(Dialer.buildNumber(prefs, mode, raw))
+                    : activity.getString(R.string.call_hint_enter_number);
+        }
+        callTitle.setText(titleRes);
+        callSub.setText(sub);
+        callButton.setEnabled(enabled);
+        callButton.setBackgroundTintList(ColorStateList.valueOf(
+                enabled ? activity.getColor(mode.colorResId) : activity.getColor(R.color.btn_disabled)));
+    }
+
     private void updateMatches(String raw) {
-        List<ContactStore.NumberMatch> matches = ContactStore.get(activity).matchNumber(raw, MAX_MATCHES);
+        String digits = Numbers.digitsOnly(raw);
+        List<ContactStore.NumberMatch> matches = new ArrayList<>();
+        if (!digits.isEmpty()) {
+            ContactStore store = ContactStore.get(activity);
+            Set<String> seen = new HashSet<>();
+            // (a) number matches first: work then private numbers containing the digits.
+            for (ContactStore.NumberMatch m : store.matchNumber(raw, MAX_MATCHES)) {
+                if (matches.size() < MAX_MATCHES && seen.add(m.contact.id + (m.work ? "w" : "p"))) {
+                    matches.add(m);
+                }
+            }
+            for (ContactStore.NumberMatch m : matches) {
+                seen.add(m.contact.id);
+            }
+            // (b) T9 name matches, one row per contact not already listed.
+            if (digits.length() >= 2) {
+                for (Contact c : store.getAll(ContactStore.SortMode.LAST_NAME)) {
+                    if (matches.size() >= MAX_MATCHES) {
+                        break;
+                    }
+                    if (seen.contains(c.id) || !T9.matchesName(c.firstName, c.lastName, digits)) {
+                        continue;
+                    }
+                    boolean work = !Numbers.isEmpty(c.workNumber);
+                    String number = work ? c.workNumber : c.privateNumber;
+                    if (Numbers.isEmpty(number)) {
+                        continue;
+                    }
+                    seen.add(c.id);
+                    matches.add(new ContactStore.NumberMatch(c, work, number));
+                }
+            }
+        }
         for (int i = 0; i < matchRows.length; i++) {
             TextView row = matchRows[i];
             if (i >= matches.size()) {

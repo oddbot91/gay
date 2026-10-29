@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Groups in the contacts list -->
+    <string name="group_other">Övriga</string>
+    <string name="group_favorites">Favoriter</string>
+    <string name="cd_favorite">Favorit</string>
+
+    <!-- Favorites -->
+    <string name="action_add_favorite">Lägg till i favoriter</string>
+    <string name="action_remove_favorite">Ta bort från favoriter</string>
+    <string name="max_favorites">Max 10 favoriter</string>
+    <string name="label_favorite">Favorit</string>
+
+    <!-- Edit dialog: category -->
+    <string name="label_category">Kategori</string>
+    <string name="category_none">Ingen kategori</string>
+    <string name="category_new_item">+ Ny kategori…</string>
+    <string name="dialog_new_category_title">Ny kategori</string>
+    <string name="hint_category_name">Kategorinamn</string>
+    <string name="category_add_failed">Kategorin finns redan eller är tom.</string>
+
+    <!-- Manage categories -->
+    <string name="menu_categories">Kategorier…</string>
+    <string name="dialog_categories_title">Kategorier</string>
+    <string name="categories_empty">Det finns inga kategorier.</string>
+    <string name="category_add">Lägg till</string>
+    <string name="close">Stäng</string>
+    <string name="ok">OK</string>
+    <string name="cd_remove_category">Ta bort kategorin %1$s</string>
+    <string name="confirm_remove_category_empty">Ta bort kategorin %1$s?</string>
+    <plurals name="confirm_remove_category">
+        <item quantity="one">Ta bort kategorin %1$s? %2$d kontakt flyttas till Övriga.</item>
+        <item quantity="other">Ta bort kategorin %1$s? %2$d kontakter flyttas till Övriga.</item>
+    </plurals>
+
+    <!-- Import -->
+    <string name="import_choice_title">Importera kontakter</string>
+    <string name="import_from_file">Från fil (JSON eller CSV)</string>
+    <string name="import_from_paste">Klistra in lista</string>
+    <string name="import_paste_title">Klistra in lista</string>
+    <string name="import_paste_hint">Anna Andersson; 30771; 070-123 45 67; Läkare</string>
+    <string name="import_paste_help">En kontakt per rad:\nFörnamn Efternamn ; Jobbnr ; Privatnr ; Kategori\nSeparatorn kan vara semikolon, tab eller komma. Sista ordet i namnet blir efternamn. Jobbnr, privatnr och kategori är valfria. Kategorier som saknas skapas. En rubrikrad hoppas över.</string>
+    <string name="import_paste_empty">Klistra in minst en rad.</string>
+    <string name="import_action">Importera</string>
+</resources>

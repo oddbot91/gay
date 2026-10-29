@@ -16,8 +16,8 @@
     <color name="tab_selected">#FF82B1FF</color>
     <color name="tab_unselected">#FFA0A0A0</color>
 
-    <color name="mode_internal">#FF82B1FF</color>
-    <color name="mode_patient">#FFCE93D8</color>
-    <color name="mode_switchboard">#FF81C784</color>
+    <color name="mode_internal">#FF66BB6A</color>
+    <color name="mode_patient">#FFBA68C8</color>
+    <color name="mode_switchboard">#FF64B5F6</color>
     <color name="mode_private">#FFFFB74D</color>
 </resources>

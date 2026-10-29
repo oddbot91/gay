@@ -3,7 +3,7 @@
     <!-- Taller screens: larger keypad keys and number field. -->
     <dimen name="number_row_height">72dp</dimen>
     <dimen name="number_text_size">34sp</dimen>
-    <dimen name="key_height">62dp</dimen>
+    <dimen name="key_height">60dp</dimen>
     <dimen name="key_gap">4dp</dimen>
-    <dimen name="call_button_min_height">60dp</dimen>
+    <dimen name="call_button_min_height">68dp</dimen>
 </resources>

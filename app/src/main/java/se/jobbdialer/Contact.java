@@ -13,19 +13,31 @@ final class Contact {
     private static final String J_LAST = "lastName";
     private static final String J_WORK = "workNumber";
     private static final String J_PRIVATE = "privateNumber";
+    private static final String J_CATEGORY = "category";
+    private static final String J_FAVORITE = "favorite";
 
     final String id;
     String firstName;
     String lastName;
     String workNumber;
     String privateNumber;
+    /** Category name; "" = none (shown under "Övriga"). Never null. */
+    String category;
+    boolean favorite;
 
     Contact(String id, String firstName, String lastName, String workNumber, String privateNumber) {
+        this(id, firstName, lastName, workNumber, privateNumber, "", false);
+    }
+
+    Contact(String id, String firstName, String lastName, String workNumber, String privateNumber,
+            String category, boolean favorite) {
         this.id = isBlank(id) ? newId() : id.trim();
         this.firstName = trim(firstName);
         this.lastName = trim(lastName);
         this.workNumber = trim(workNumber);
         this.privateNumber = trim(privateNumber);
+        this.category = trim(category);
+        this.favorite = favorite;
     }
 
     static Contact create(String firstName, String lastName, String workNumber, String privateNumber) {
@@ -60,7 +72,17 @@ final class Contact {
 
     /** Copy with a fresh id (used when an imported id collides with an existing one). */
     Contact withNewId() {
-        return new Contact(newId(), firstName, lastName, workNumber, privateNumber);
+        return new Contact(newId(), firstName, lastName, workNumber, privateNumber, category, favorite);
+    }
+
+    /** Copy with another category. */
+    Contact withCategory(String newCategory) {
+        return new Contact(id, firstName, lastName, workNumber, privateNumber, newCategory, favorite);
+    }
+
+    /** Copy with another favorite flag. */
+    Contact withFavorite(boolean newFavorite) {
+        return new Contact(id, firstName, lastName, workNumber, privateNumber, category, newFavorite);
     }
 
     JSONObject toJson() throws JSONException {
@@ -70,6 +92,8 @@ final class Contact {
         o.put(J_LAST, lastName);
         o.put(J_WORK, workNumber);
         o.put(J_PRIVATE, privateNumber);
+        o.put(J_CATEGORY, category);
+        o.put(J_FAVORITE, favorite);
         return o;
     }
 
@@ -83,7 +107,9 @@ final class Contact {
                 o.optString(J_FIRST, ""),
                 o.optString(J_LAST, ""),
                 o.optString(J_WORK, ""),
-                o.optString(J_PRIVATE, ""));
+                o.optString(J_PRIVATE, ""),
+                o.optString(J_CATEGORY, ""),
+                o.optBoolean(J_FAVORITE, false));
     }
 
     private static String trim(String s) {

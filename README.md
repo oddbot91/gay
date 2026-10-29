@@ -9,17 +9,24 @@ Kräver Android 8.0 (API 26) eller senare.
 
 ## Funktioner
 
-### Tre ringlägen
+### Tre ringlägen, en ringknapp
 
-| Knapp | Vad som rings | Exempel |
-|---|---|---|
-| **RING INTERNT** | internprefix + slaget nummer (standard `03134`) | `30771` → `0313430771` |
-| **RING PATIENT** | patientprefix + slaget nummer (standard `#31#` = dolt nummer) | `0701234567` → `#31#0701234567` |
-| **RING VÄXELN** | växelnumret, utan prefix (standard `0313427000`) | → `0313427000` |
+Ovanför knappsatsen finns en lägesväljare med tre segment: **Internt | Patient | Växeln**.
+Det valda läget fylls med lägets färg (grönt, lila respektive blått) och appen minns ditt val.
+Under knappsatsen finns en enda stor ringknapp i lägets färg. Rubriken ändras med läget och
+underraden visar numret som faktiskt rings.
 
+| Läge | Knapp | Vad som rings | Exempel |
+|---|---|---|---|
+| **Internt** | RING INTERNT | internprefix + slaget nummer (standard `03134`) | `30771` → `0313430771` |
+| **Patient** | RING PATIENT | patientprefix + slaget nummer (standard `#31#` = dolt nummer) | `0701234567` → `#31#0701234567` |
+| **Växeln** | RING VÄXELN | växelnumret, utan prefix (standard `0313427000`) | → `0313427000` |
+
+- I lägena Internt och Patient är knappen grå och inaktiv så länge nummerfältet är tomt. I
+  läget Växeln är den alltid aktiv.
 - Om numret redan börjar med prefixet läggs prefixet inte till en gång till. Internprefixet läggs inte heller till om numret är ett fullständigt nummer (börjar med 0 eller + och har minst 8 siffror).
   (`0313430771` → `0313430771`).
-- Under nummerfältet visas en förhandsvisning, t.ex. `Internt → 03134 30771 · Patient → #31# 30771`.
+- Numret som rings visas på ringknappens underrad, t.ex. `031 34 307 71` eller `#31# 070-123 45 67`.
 - Prefixen och växelnumret ändrar du under **Inställningar**. Där finns också
   **Återställ standard**.
 - Samtalet kopplas upp direkt. Första gången frågar Android om behörigheten **Ring**
@@ -32,12 +39,46 @@ Kräver Android 8.0 (API 26) eller senare.
 - Varje kontakt har förnamn, efternamn, jobbnr (kortnummer) och privatnr.
 - Tryck på **Jobb 30771** för att ringa internt (med prefix). Tryck på
   **Privat 070-444 44 44** för att ringa privatnumret som det är, utan prefix.
-- Håll in en kontakt för att välja **Ring privat med dolt nummer (#31#)**, **Redigera**
-  eller **Ta bort**.
+- Håll in en kontakt för att välja **Ring privat med dolt nummer (#31#)**, **Lägg till i
+  favoriter** / **Ta bort från favoriter**, **Redigera** eller **Ta bort**.
 - Du kan söka på namn och nummer. Listan kan sorteras på efternamn, förnamn, jobbnr eller
   privatnr, och appen kommer ihåg valet.
-- När du slår siffror på knappsatsen visas upp till tre kontakter med matchande nummer.
-  Tryck på en kontakt för att fylla i numret.
+- Kontakterna kan ordnas i **kategorier** och **favoriter** (se nedan).
+
+### Sök kontakter från knappsatsen (T9)
+
+När du slår siffror visas upp till fyra träffar under nummerfältet. En kontakt matchar om
+jobbnumret eller privatnumret innehåller siffrorna, eller om namnet matchar siffrorna som på en
+gammal mobiltelefon (T9). Knapparna visar bokstäverna: `2` = ABC, `3` = DEF, `4` = GHI,
+`5` = JKL, `6` = MNO, `7` = PQRS, `8` = TUV, `9` = WXYZ (svenska Å, Ä och Ö ligger på 2 och 6).
+`0` är mellanslag.
+
+- Siffrorna ska matcha början av förnamnet eller efternamnet, eller början av hela namnet.
+  `2662` hittar *Anna* (A-N-N-A) och `26620263` hittar *Anna Andersson*
+  (förnamn, mellanslag, början av efternamnet).
+- Namnsökningen kräver minst två siffror. Nummersökningen fungerar från en siffra.
+- Raden visar t.ex. `Anna Andersson · Jobb 30771`. Tryck på raden för att fylla i numret.
+  Det du har slagit raderas inte förrän du trycker på en rad.
+
+### Kategorier
+
+Kontaktlistan är grupperad i kollapsbara kategorier. Från start finns **Avdelningar**,
+**Konsulttelefoner**, **Läkare** och **Operationssalar**. Kontakter utan kategori hamnar under
+**Övriga**.
+
+- Tryck på en grupprubrik för att fälla ut eller in den. Alla grupper är hopfällda när appen
+  startar.
+- Välj kategori när du lägger till eller redigerar en kontakt. Väljer du *+ Ny kategori…* kan du
+  skapa en ny direkt.
+- **Kategorier…** i menyn (⋮) låter dig lägga till och ta bort kategorier. När du tar bort en
+  kategori flyttas dess kontakter till Övriga (appen säger först hur många det gäller).
+- Under sökning visas träffarna som en vanlig lista utan grupper.
+
+### Favoriter
+
+Markera en kontakt som **Favorit** i redigeringsdialogen, eller håll in kontakten och välj
+**Lägg till i favoriter**. Favoriterna visas sist i listan i gruppen **Favoriter**, som alltid är
+utfälld, och en liten stjärna visas efter namnet. Du kan ha högst 10 favoriter.
 
 ### Senaste
 
@@ -50,12 +91,35 @@ tidpunkt. Listan sparar högst 200 samtal.
 ### Export och import av kontakter
 
 Välj **Exportera kontakter** eller **Importera kontakter**, antingen i menyn (⋮) eller under
-Inställningar. Kontakterna sparas som en JSON-fil via Androids filväljare, t.ex. på telefonen,
-i Google Drive eller på ett SD-kort.
+Inställningar. Exporten sparas som en JSON-fil via Androids filväljare, t.ex. på telefonen,
+i Google Drive eller på ett SD-kort. Filen innehåller även kategorier och favoritmarkeringar
+(filformat version 2). Äldre exportfiler utan kategorier går fortfarande att importera.
 
 Import slår ihop filen med kontakterna som redan finns. En kontakt hoppas över om det redan
-finns en kontakt med samma jobbnr, eller med samma namn och samma privatnr. Med en
-export/import kan du alltså flytta telefonboken till en ny telefon.
+finns en kontakt med samma jobbnr, eller med samma namn och samma privatnr. Kategorier som
+finns i filen men inte i appen skapas. Med en export/import kan du alltså flytta telefonboken
+till en ny telefon.
+
+### Importera många kontakter på en gång
+
+**Importera kontakter** frågar först om du vill importera **Från fil (JSON eller CSV)** eller
+**Klistra in lista**. Båda använder samma format: en kontakt per rad.
+
+```
+Förnamn Efternamn ; Jobbnr ; Privatnr ; Kategori
+Anna Andersson; 30771; 070-123 45 67; Läkare
+Bo Berg; 30772; ; Avdelningar
+Cecilia Ek	30773
+```
+
+- Skilj fälten åt med semikolon, tab eller komma (det första av dem som finns på raden gäller).
+- Det sista ordet i namnet blir efternamn och resten förnamn. Ett enda ord blir förnamn.
+- Jobbnr, privatnr och kategori är valfria. En kategori som inte finns skapas.
+- Tomma rader hoppas över, liksom en rubrikrad (en första rad som innehåller *namn* eller
+  *jobb* utan siffror i nummerfälten).
+- Kontakter som redan finns hoppas över enligt samma regler som ovan. Efteråt visas t.ex.
+  *12 kontakter lades till. 2 hoppades över.*
+- Filer som börjar med `{` eller `[` tolkas som JSON-export, allt annat som en lista enligt ovan.
 
 ### Dölj appens samtal i telefonens samtalslogg (valfritt)
 

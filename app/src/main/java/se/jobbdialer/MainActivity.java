@@ -11,9 +11,11 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.Toolbar;
@@ -247,6 +249,10 @@ public class MainActivity extends Activity {
             }
             return true;
         }
+        if (id == R.id.action_categories) {
+            contactsPane.showCategoriesDialog();
+            return true;
+        }
         if (id == R.id.action_export) {
             startExport(this);
             return true;
@@ -316,15 +322,40 @@ public class MainActivity extends Activity {
         }
     }
 
-    /** Opens the SAF "open document" picker for a contacts import. */
+    /** Import entry point: asks whether to import from a file or from pasted text. */
+    static void startImport(final Activity activity) {
+        if (activity.isFinishing() || activity.isDestroyed()) {
+            return;
+        }
+        String[] items = {
+                activity.getString(R.string.import_from_file),
+                activity.getString(R.string.import_from_paste)};
+        new AlertDialog.Builder(activity)
+                .setTitle(R.string.import_choice_title)
+                .setItems(items, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == 0) {
+                            startFileImport(activity);
+                        } else if (which == 1) {
+                            showPasteImportDialog(activity);
+                        }
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
+    }
+
+    /** Opens the SAF "open document" picker for a contacts import (JSON or CSV/text). */
     @SuppressWarnings("deprecation")
-    static void startImport(Activity activity) {
+    private static void startFileImport(Activity activity) {
         Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        intent.setType(MIME_JSON);
-        // Some providers report .json files as text/plain or octet-stream; allow those too.
-        intent.putExtra(Intent.EXTRA_MIME_TYPES,
-                new String[]{MIME_JSON, "text/plain", "application/octet-stream"});
+        intent.setType("*/*");
+        // Some providers report .json/.csv files as text/plain or octet-stream; allow those too.
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{
+                MIME_JSON, "text/csv", "text/comma-separated-values", "text/plain",
+                "application/octet-stream"});
         try {
             activity.startActivityForResult(intent, REQUEST_IMPORT);
         } catch (ActivityNotFoundException e) {
@@ -333,6 +364,56 @@ public class MainActivity extends Activity {
             Log.w(TAG, "Could not open the document picker", e);
             Toast.makeText(activity, R.string.no_file_app, Toast.LENGTH_SHORT).show();
         }
+    }
+
+    /** Dialog with a multi-line field; each line becomes a contact (see ContactStore#importText). */
+    private static void showPasteImportDialog(final Activity activity) {
+        if (activity.isFinishing() || activity.isDestroyed()) {
+            return;
+        }
+        View body = LayoutInflater.from(activity).inflate(R.layout.dialog_bulk_import, null, false);
+        final EditText field = body.findViewById(R.id.bulk_text);
+        final AlertDialog dialog = new AlertDialog.Builder(activity)
+                .setTitle(R.string.import_paste_title)
+                .setView(body)
+                .setPositiveButton(R.string.import_action, null)
+                .setNegativeButton(R.string.cancel, null)
+                .create();
+        dialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface d) {
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String text = field.getText() == null ? "" : field.getText().toString();
+                        if (text.trim().isEmpty()) {
+                            Toast.makeText(activity, R.string.import_paste_empty, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        dialog.dismiss();
+                        showImportResult(activity, ContactStore.get(activity).importText(text));
+                        if (activity instanceof MainActivity) {
+                            ((MainActivity) activity).refreshPanes();
+                        }
+                    }
+                });
+            }
+        });
+        dialog.show();
+        field.requestFocus();
+    }
+
+    private static void showImportResult(Activity activity, ContactStore.ImportResult result) {
+        if (result.failed()) {
+            Toast.makeText(activity, R.string.import_failed, Toast.LENGTH_LONG).show();
+            return;
+        }
+        String msg = activity.getResources().getQuantityString(R.plurals.import_added, result.added, result.added);
+        if (result.skipped > 0) {
+            msg = msg + " " + activity.getResources()
+                    .getQuantityString(R.plurals.import_skipped, result.skipped, result.skipped);
+        }
+        Toast.makeText(activity, msg, Toast.LENGTH_LONG).show();
     }
 
     /**
@@ -362,17 +443,7 @@ public class MainActivity extends Activity {
             }
             return true;
         }
-        ContactStore.ImportResult result = store.importFrom(activity, uri);
-        if (result.failed()) {
-            Toast.makeText(activity, R.string.import_failed, Toast.LENGTH_LONG).show();
-            return true;
-        }
-        String msg = activity.getResources().getQuantityString(R.plurals.import_added, result.added, result.added);
-        if (result.skipped > 0) {
-            msg = msg + " " + activity.getResources()
-                    .getQuantityString(R.plurals.import_skipped, result.skipped, result.skipped);
-        }
-        Toast.makeText(activity, msg, Toast.LENGTH_LONG).show();
+        showImportResult(activity, store.importFrom(activity, uri));
         return true;
     }
 }
