@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="cd_mode_selector">Välj samtalsläge</string>
+    <string name="match_no_number">%1$s · inget nummer</string>
+    <string name="toast_contact_no_number">%1$s har inget telefonnummer – lägg till ett under Kontakter.</string>
     <!-- %1$s = T9 digits computed for "Bögen" at runtime, %2$s = ✓ or ✗, %3$d = number of contacts -->
     <string name="t9_selftest">Självtest T9: Bögen → %1$s %2$s · %3$d kontakter i telefonboken</string>
 </resources>

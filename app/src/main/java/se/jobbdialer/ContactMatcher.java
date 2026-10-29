@@ -23,7 +23,10 @@ import java.util.Set;
  */
 final class ContactMatcher {
 
-    /** One keypad match: which contact, and which of its numbers fills the field on tap. */
+    /**
+     * One keypad match: which contact, and which of its numbers fills the field on tap.
+     * {@code number} is "" for a name match on a contact that has no number.
+     */
     static final class Match {
         final Contact contact;
         final boolean work;
@@ -32,7 +35,11 @@ final class ContactMatcher {
         Match(Contact contact, boolean work, String number) {
             this.contact = contact;
             this.work = work;
-            this.number = number;
+            this.number = number == null ? "" : number;
+        }
+
+        boolean hasNumber() {
+            return !Numbers.digitsOnly(number).isEmpty();
         }
 
         @Override
@@ -74,11 +81,10 @@ final class ContactMatcher {
                 if (c == null || shown.contains(c.id) || !T9.matchesName(c.firstName, c.lastName, digits)) {
                     continue;
                 }
+                // A name match is shown even when the contact has no number at all (number = ""),
+                // so the user sees that the contact was found and can add a number to it.
                 boolean work = hasDigits(c.workNumber);
-                String number = work ? c.workNumber : c.privateNumber;
-                if (!hasDigits(number)) {
-                    continue; // nothing to fill in
-                }
+                String number = work ? c.workNumber : (hasDigits(c.privateNumber) ? c.privateNumber : "");
                 shown.add(c.id);
                 result.add(new Match(c, work, number));
             }

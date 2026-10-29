@@ -110,13 +110,21 @@ public final class T9Test {
         eq("one row per contact (private matches) size", 5, numberRows.size());
         eq("distinct contacts", 5, distinctIds(numberRows));
 
-        // A name match without any number is skipped (nothing to fill in); null fields are safe.
+        // A name match without any number is still shown (number ""), so the user sees the hit;
+        // null fields are safe; a '-' work number counts as no work number.
         List<Contact> odd = Arrays.asList(
                 new Contact("x", "Bertil", "Nummerlös", "", ""),
                 new Contact(null, null, null, null, "0311234567"),
                 new Contact("y", "Bea", "", "-", "0731112233"));
-        rows("name match without number skipped, '-' work number ignored", ContactMatcher.match(odd, "23", 5),
-                "Bea private 0731112233");
+        rows("name match without number shown with empty number, '-' work number ignored",
+                ContactMatcher.match(odd, "23", 5),
+                "Bertil Nummerlös private ", "Bea private 0731112233");
+        no("match without number reports hasNumber()=false", ContactMatcher.match(odd, "23", 5).get(0).hasNumber());
+        yes("match with number reports hasNumber()=true", ContactMatcher.match(odd, "23", 5).get(1).hasNumber());
+        // The user's case: a contact that only has a name must still appear as a suggestion.
+        rows("Bögen without number is suggested",
+                ContactMatcher.match(Arrays.asList(new Contact("z", "Bögen", "Blgenson", "", "")), "26436", 5),
+                "Bögen Blgenson private ");
         rows("unnamed contact via number", ContactMatcher.match(odd, "031", 5), " private 0311234567");
 
         System.out.println(passed + " assertions passed");

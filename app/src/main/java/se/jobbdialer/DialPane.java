@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Collections;
 import java.util.List;
@@ -248,20 +249,32 @@ final class DialPane {
         LayoutInflater inflater = LayoutInflater.from(activity);
         for (final ContactMatcher.Match m : matches) {
             TextView row = (TextView) inflater.inflate(R.layout.row_match, matchContainer, false);
-            String name = m.contact.displayName();
-            if (name.isEmpty()) {
-                name = activity.getString(R.string.contact_unnamed);
+            String displayName = m.contact.displayName();
+            final String name = displayName.isEmpty() ? activity.getString(R.string.contact_unnamed) : displayName;
+            if (m.hasNumber()) {
+                row.setText(activity.getString(m.work ? R.string.match_work : R.string.match_private,
+                        name, Numbers.formatForDisplay(m.number)));
+                row.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        numberField.setText(Numbers.clean(m.number));
+                        numberField.setSelection(numberField.length());
+                    }
+                });
+            } else {
+                // Name found but the contact has no number: show it, explain on tap.
+                row.setText(activity.getString(R.string.match_no_number, name));
+                row.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        Toast.makeText(activity, activity.getString(R.string.toast_contact_no_number, name),
+                                Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
-            row.setText(activity.getString(m.work ? R.string.match_work : R.string.match_private,
-                    name, Numbers.formatForDisplay(m.number)));
-            row.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    numberField.setText(Numbers.clean(m.number));
-                    numberField.setSelection(numberField.length());
-                }
-            });
-            matchContainer.addView(row);
+            // The container sits above the keypad and grows upwards: insert at the top so the
+            // best match (first in the list) ends up as the bottom row, closest to the thumb.
+            matchContainer.addView(row, 0);
         }
         matchContainer.setVisibility(View.VISIBLE);
     }
