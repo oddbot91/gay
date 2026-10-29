@@ -12,7 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -234,10 +234,23 @@ final class DialPane {
      * on pre-existing views or style inheritance.
      */
     private void updateMatches(String raw) {
-        List<ContactMatcher.Match> matches = raw.isEmpty()
-                ? Collections.<ContactMatcher.Match>emptyList()
-                : ContactMatcher.match(
-                        ContactStore.get(activity).getAll(ContactStore.SortMode.LAST_NAME), raw, MAX_MATCHES);
+        ContactStore store = ContactStore.get(activity);
+        List<ContactMatcher.Match> matches;
+        boolean bestLast;
+        if (raw.isEmpty()) {
+            // Nothing typed yet: offer the favourites (alphabetical, top to bottom) in the same spot.
+            matches = new ArrayList<>();
+            for (Contact c : store.getFavorites(ContactStore.SortMode.LAST_NAME, ContactStore.MAX_FAVORITES)) {
+                boolean work = !Numbers.digitsOnly(c.workNumber).isEmpty();
+                String number = work ? c.workNumber
+                        : (!Numbers.digitsOnly(c.privateNumber).isEmpty() ? c.privateNumber : "");
+                matches.add(new ContactMatcher.Match(c, work, number));
+            }
+            bestLast = false;
+        } else {
+            matches = ContactMatcher.match(store.getAll(ContactStore.SortMode.LAST_NAME), raw, MAX_MATCHES);
+            bestLast = true;
+        }
         if (matchContainer == null) {
             return;
         }
@@ -272,9 +285,14 @@ final class DialPane {
                     }
                 });
             }
-            // The container sits above the keypad and grows upwards: insert at the top so the
-            // best match (first in the list) ends up as the bottom row, closest to the thumb.
-            matchContainer.addView(row, 0);
+            // The container sits above the keypad and grows upwards. For search results the best
+            // match (first in the list) is inserted at the top so it ends up as the bottom row,
+            // closest to the thumb; favourites keep their alphabetical order top to bottom.
+            if (bestLast) {
+                matchContainer.addView(row, 0);
+            } else {
+                matchContainer.addView(row);
+            }
         }
         matchContainer.setVisibility(View.VISIBLE);
     }
