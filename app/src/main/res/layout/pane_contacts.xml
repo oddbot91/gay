@@ -1,10 +1,37 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- "Kontakter" pane: search field + sort button, the list, empty text and the round add button. -->
+<!-- "Kontakter" pane, anchored to the bottom (closer to the thumb): the list stacks from the
+     bottom, so a short list (e.g. collapsed groups) ends right above the bottom bar with the
+     "Favoriter" group last; the bottom bar holds the search field, sort button and add button. -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <!-- List area: the empty text is the ListView's empty view and is centred in this area. -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ListView
+            android:id="@+id/contacts_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:divider="@color/divider"
+            android:dividerHeight="1dp"
+            android:stackFromBottom="true" />
+
+        <TextView
+            android:id="@+id/contacts_empty"
+            style="@style/EmptyText" />
+    </FrameLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="@color/divider" />
+
+    <!-- Bottom bar: [search] [sort] [+] -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -12,7 +39,8 @@
         android:orientation="horizontal"
         android:paddingLeft="@dimen/space_medium"
         android:paddingTop="@dimen/space_tiny"
-        android:paddingRight="@dimen/space_tiny">
+        android:paddingRight="@dimen/space_small"
+        android:paddingBottom="@dimen/space_tiny">
 
         <EditText
             android:id="@+id/search_field"
@@ -41,37 +69,16 @@
             android:paddingRight="@dimen/space_small"
             android:textColor="@color/brand_text"
             android:textSize="14sp" />
-    </LinearLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1">
-
-        <ListView
-            android:id="@+id/contacts_list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:divider="@color/divider"
-            android:dividerHeight="1dp"
-            android:paddingBottom="@dimen/list_bottom_padding" />
-
-        <TextView
-            android:id="@+id/contacts_empty"
-            style="@style/EmptyText" />
 
         <ImageButton
             android:id="@+id/fab_add"
-            android:layout_width="@dimen/fab_size"
-            android:layout_height="@dimen/fab_size"
-            android:layout_gravity="bottom|end"
-            android:layout_margin="@dimen/fab_margin"
+            android:layout_width="@dimen/add_button_size"
+            android:layout_height="@dimen/add_button_size"
+            android:layout_marginStart="@dimen/space_tiny"
             android:background="@drawable/fab_bg"
             android:contentDescription="@string/cd_add_contact"
-            android:elevation="@dimen/fab_elevation"
             android:scaleType="center"
             android:src="@drawable/ic_add"
             android:tint="@color/on_color" />
-    </FrameLayout>
+    </LinearLayout>
 </LinearLayout>

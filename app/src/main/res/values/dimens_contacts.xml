@@ -8,4 +8,6 @@
     <dimen name="favorite_star_size">14dp</dimen>
     <dimen name="category_row_min_height">48dp</dimen>
     <dimen name="contact_row_padding_start">24dp</dimen>
+    <!-- Round "+" button in the contacts bottom bar. -->
+    <dimen name="add_button_size">40dp</dimen>
 </resources>

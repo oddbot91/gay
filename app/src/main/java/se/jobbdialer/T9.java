@@ -54,11 +54,12 @@ final class T9 {
     }
 
     /**
-     * True when {@code digits} (at least 2, digits only) is the T9 start of the first name, the
-     * last name, both joined, or "first last" (where 0 stands for the space). Null-safe.
+     * True when {@code digits} (at least 1, digits only) is the T9 start of a word of the first
+     * or last name (words split on spaces and hyphens), of the whole first or last name, of both
+     * joined without space, or of "first last" (where 0 stands for the space). Null-safe.
      */
     static boolean matchesName(String firstName, String lastName, String digits) {
-        if (digits == null || digits.length() < 2) {
+        if (digits == null || digits.isEmpty()) {
             return false;
         }
         for (int i = 0; i < digits.length(); i++) {
@@ -69,9 +70,28 @@ final class T9 {
         }
         String f = firstName == null ? "" : firstName.trim();
         String l = lastName == null ? "" : lastName.trim();
-        return toDigits(f).startsWith(digits)
+        if (f.isEmpty() && l.isEmpty()) {
+            return false;
+        }
+        if (toDigits(f).startsWith(digits)
                 || toDigits(l).startsWith(digits)
                 || toDigits(f + l).startsWith(digits)
-                || toDigits(f + " " + l).startsWith(digits);
+                || (!f.isEmpty() && !l.isEmpty() && toDigits(f + " " + l).startsWith(digits))) {
+            return true;
+        }
+        return anyWordStartsWith(f, digits) || anyWordStartsWith(l, digits);
+    }
+
+    /** True when a word of {@code name} (split on whitespace and hyphens) starts with the digits. */
+    private static boolean anyWordStartsWith(String name, String digits) {
+        if (name.isEmpty()) {
+            return false;
+        }
+        for (String word : name.split("[\\s\\-]+")) {
+            if (!word.isEmpty() && toDigits(word).startsWith(digits)) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -9,21 +9,25 @@ Kräver Android 8.0 (API 26) eller senare.
 
 ## Funktioner
 
-### Tre ringlägen, en ringknapp
+### Två ringlägen och växeln, en ringknapp
 
-Ovanför knappsatsen finns en lägesväljare med tre segment: **Internt | Patient | Växeln**.
-Det valda läget fylls med lägets färg (grönt, lila respektive blått) och appen minns ditt val.
-Under knappsatsen finns en enda stor ringknapp i lägets färg. Rubriken ändras med läget och
-underraden visar numret som faktiskt rings.
+Ovanför knappsatsen finns en lägesväljare med två segment: **Internt | Patient**.
+Det valda läget fylls med lägets färg (grönt respektive lila) och appen minns ditt val.
+Under knappsatsen finns en enda stor ringknapp och till höger om den backstegsknappen
+(tryck = radera en siffra, håll in = rensa fältet).
+
+- **Tomt nummerfält:** knappen heter **RING VÄXELN**, är blå och ringer växelnumret utan prefix
+  (standard `0313427000`). Underraden visar växelnumret. Är inget växelnummer inställt är
+  knappen grå och inaktiv.
+- **Nummer ifyllt:** knappen heter **RING INTERNT** eller **RING PATIENT** beroende på valt läge,
+  har lägets färg och underraden visar numret som faktiskt rings.
 
 | Läge | Knapp | Vad som rings | Exempel |
 |---|---|---|---|
 | **Internt** | RING INTERNT | internprefix + slaget nummer (standard `03134`) | `30771` → `0313430771` |
 | **Patient** | RING PATIENT | patientprefix + slaget nummer (standard `#31#` = dolt nummer) | `0701234567` → `#31#0701234567` |
-| **Växeln** | RING VÄXELN | växelnumret, utan prefix (standard `0313427000`) | → `0313427000` |
+| *(tomt fält)* | RING VÄXELN | växelnumret, utan prefix (standard `0313427000`) | → `0313427000` |
 
-- I lägena Internt och Patient är knappen grå och inaktiv så länge nummerfältet är tomt. I
-  läget Växeln är den alltid aktiv.
 - Om numret redan börjar med prefixet läggs prefixet inte till en gång till. Internprefixet läggs inte heller till om numret är ett fullständigt nummer (börjar med 0 eller + och har minst 8 siffror).
   (`0313430771` → `0313430771`).
 - Numret som rings visas på ringknappens underrad, t.ex. `031 34 307 71` eller `#31# 070-123 45 67`.
@@ -44,19 +48,22 @@ underraden visar numret som faktiskt rings.
 - Du kan söka på namn och nummer. Listan kan sorteras på efternamn, förnamn, jobbnr eller
   privatnr, och appen kommer ihåg valet.
 - Kontakterna kan ordnas i **kategorier** och **favoriter** (se nedan).
+- Sökfältet, sorteringen och knappen **+** (ny kontakt) ligger längst ner, nära tummen, och
+  listan fylls nerifrån, så att gruppen Favoriter hamnar precis ovanför sökfältet.
 
 ### Sök kontakter från knappsatsen (T9)
 
-När du slår siffror visas upp till fyra träffar under nummerfältet. En kontakt matchar om
-jobbnumret eller privatnumret innehåller siffrorna, eller om namnet matchar siffrorna som på en
-gammal mobiltelefon (T9). Knapparna visar bokstäverna: `2` = ABC, `3` = DEF, `4` = GHI,
+När du slår siffror visas upp till fem träffar under nummerfältet, en rad per kontakt. Först
+visas kontakter vars namn matchar siffrorna som på en gammal mobiltelefon (T9), därefter
+kontakter vars nummer matchar. Knapparna visar bokstäverna: `2` = ABC, `3` = DEF, `4` = GHI,
 `5` = JKL, `6` = MNO, `7` = PQRS, `8` = TUV, `9` = WXYZ (svenska Å, Ä och Ö ligger på 2 och 6).
 `0` är mellanslag.
 
-- Siffrorna ska matcha början av förnamnet eller efternamnet, eller början av hela namnet.
-  `2662` hittar *Anna* (A-N-N-A) och `26620263` hittar *Anna Andersson*
-  (förnamn, mellanslag, början av efternamnet).
-- Namnsökningen kräver minst två siffror. Nummersökningen fungerar från en siffra.
+- Siffrorna ska matcha början av förnamnet eller efternamnet (eller ett ord i dem), eller
+  början av hela namnet. `2662` hittar *Anna* (A-N-N-A) och `26620263` hittar *Anna Andersson*
+  (förnamn, mellanslag, början av efternamnet). Namnsökningen fungerar från första siffran.
+- Nummersökning: med en eller två siffror visas nummer som *börjar* med siffrorna, från tre
+  siffror även nummer som *innehåller* dem (nummer som börjar med siffrorna visas först).
 - Raden visar t.ex. `Anna Andersson · Jobb 30771`. Tryck på raden för att fylla i numret.
   Det du har slagit raderas inte förrän du trycker på en rad.
 

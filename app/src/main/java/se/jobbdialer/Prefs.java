@@ -76,13 +76,18 @@ final class Prefs {
 
     // ------------------------------------------------------------------ dial mode
 
-    /** Selected mode of the dial pane; INTERNAL, PATIENT or SWITCHBOARD (never PRIVATE). */
+    /**
+     * Selected mode of the dial pane: INTERNAL or PATIENT. A stored SWITCHBOARD (from 1.1, when
+     * the selector had a "Växeln" segment) or anything unknown maps to INTERNAL; the switchboard
+     * is now called with the call button while the number field is empty.
+     */
     Dialer.CallMode getDialMode() {
         return Dialer.parseDialMode(getString(KEY_DIAL_MODE, null));
     }
 
+    /** Stores INTERNAL or PATIENT; other modes are ignored. */
     void setDialMode(Dialer.CallMode mode) {
-        if (mode != null && mode != Dialer.CallMode.PRIVATE) {
+        if (mode == Dialer.CallMode.INTERNAL || mode == Dialer.CallMode.PATIENT) {
             sp.edit().putString(KEY_DIAL_MODE, mode.name()).apply();
         }
     }

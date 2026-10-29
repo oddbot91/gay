@@ -9,20 +9,20 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 /**
- * "Ring" pane: number field with the app's own keypad (with T9 letters), up to four matching
- * contacts (number or T9 name match), a mode selector (Internt / Patient / Växeln) and a single
- * call button. Placing the call (and recording it in the history / call log cleanup) is done
- * by {@link Dialer}.
+ * "Ring" pane: number field with the app's own keypad (with T9 letters), up to five matching
+ * contacts (T9 name matches first, then number matches; see {@link ContactMatcher}), a mode
+ * selector (Internt / Patient) and a bottom row with the single call button and backspace.
+ * With an empty number field the call button calls the switchboard; otherwise it calls the
+ * typed number in the selected mode. Placing the call (and recording it in the history / call
+ * log cleanup) is done by {@link Dialer}.
  */
 final class DialPane {
 
-    private static final int MAX_MATCHES = 4;
+    private static final int MAX_MATCHES = 5;
 
     private static final int[] DIGIT_KEY_IDS = {
             R.id.key_0, R.id.key_1, R.id.key_2, R.id.key_3, R.id.key_4,
@@ -33,7 +33,7 @@ final class DialPane {
     private final TextView[] matchRows;
     private final TextView[] segments;
     private final Dialer.CallMode[] segmentModes = {
-            Dialer.CallMode.INTERNAL, Dialer.CallMode.PATIENT, Dialer.CallMode.SWITCHBOARD};
+            Dialer.CallMode.INTERNAL, Dialer.CallMode.PATIENT};
     private final View callButton;
     private final TextView callTitle;
     private final TextView callSub;
@@ -46,11 +46,11 @@ final class DialPane {
                 root.findViewById(R.id.match_1),
                 root.findViewById(R.id.match_2),
                 root.findViewById(R.id.match_3),
-                root.findViewById(R.id.match_4)};
+                root.findViewById(R.id.match_4),
+                root.findViewById(R.id.match_5)};
         segments = new TextView[]{
                 root.findViewById(R.id.seg_internal),
-                root.findViewById(R.id.seg_patient),
-                root.findViewById(R.id.seg_switchboard)};
+                root.findViewById(R.id.seg_patient)};
         callButton = root.findViewById(R.id.call_button);
         callTitle = root.findViewById(R.id.call_title);
         callSub = root.findViewById(R.id.call_sub);
@@ -109,6 +109,7 @@ final class DialPane {
         backspace.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
+                // The framework already gives LONG_PRESS haptic feedback for a handled long click.
                 numberField.setText("");
                 return true;
             }
@@ -117,7 +118,8 @@ final class DialPane {
         callButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mode == Dialer.CallMode.SWITCHBOARD) {
+                if (Numbers.clean(input()).isEmpty()) {
+                    // Empty field: the call button is the switchboard button.
                     activity.getDialer().callSwitchboard();
                 } else {
                     activity.getDialer().call(mode, input(), null);
@@ -205,68 +207,46 @@ final class DialPane {
         boolean enabled;
         String sub;
         int titleRes;
-        if (mode == Dialer.CallMode.SWITCHBOARD) {
+        int colorRes;
+        if (raw.isEmpty()) {
+            // Empty field: calls the switchboard (enabled only when a number is configured).
             titleRes = R.string.call_switchboard;
-            String sb = Dialer.buildNumber(prefs, mode, null);
-            sub = sb.isEmpty() ? activity.getString(R.string.switchboard_not_set) : Numbers.formatForDisplay(sb);
-            enabled = true;
+            String sb = Dialer.buildNumber(prefs, Dialer.CallMode.SWITCHBOARD, null);
+            enabled = !sb.isEmpty();
+            sub = enabled ? Numbers.formatForDisplay(sb) : activity.getString(R.string.switchboard_not_set);
+            colorRes = Dialer.CallMode.SWITCHBOARD.colorResId;
         } else {
             titleRes = mode == Dialer.CallMode.PATIENT ? R.string.call_patient : R.string.call_internal;
-            enabled = !raw.isEmpty();
-            sub = enabled
-                    ? Numbers.formatForDisplay(Dialer.buildNumber(prefs, mode, raw))
-                    : activity.getString(R.string.call_hint_enter_number);
+            String number = Dialer.buildNumber(prefs, mode, raw);
+            enabled = !number.isEmpty();
+            sub = Numbers.formatForDisplay(number);
+            colorRes = mode.colorResId;
         }
         callTitle.setText(titleRes);
         callSub.setText(sub);
         callButton.setEnabled(enabled);
         callButton.setBackgroundTintList(ColorStateList.valueOf(
-                enabled ? activity.getColor(mode.colorResId) : activity.getColor(R.color.btn_disabled)));
+                activity.getColor(enabled ? colorRes : R.color.btn_disabled)));
     }
 
+    /** Shows up to {@link #MAX_MATCHES} keypad matches (all matching logic is in ContactMatcher). */
     private void updateMatches(String raw) {
-        String digits = Numbers.digitsOnly(raw);
-        List<ContactStore.NumberMatch> matches = new ArrayList<>();
-        if (!digits.isEmpty()) {
-            ContactStore store = ContactStore.get(activity);
-            Set<String> seen = new HashSet<>();
-            // (a) number matches first: work then private numbers containing the digits.
-            for (ContactStore.NumberMatch m : store.matchNumber(raw, MAX_MATCHES)) {
-                if (matches.size() < MAX_MATCHES && seen.add(m.contact.id + (m.work ? "w" : "p"))) {
-                    matches.add(m);
-                }
-            }
-            for (ContactStore.NumberMatch m : matches) {
-                seen.add(m.contact.id);
-            }
-            // (b) T9 name matches, one row per contact not already listed.
-            if (digits.length() >= 2) {
-                for (Contact c : store.getAll(ContactStore.SortMode.LAST_NAME)) {
-                    if (matches.size() >= MAX_MATCHES) {
-                        break;
-                    }
-                    if (seen.contains(c.id) || !T9.matchesName(c.firstName, c.lastName, digits)) {
-                        continue;
-                    }
-                    boolean work = !Numbers.isEmpty(c.workNumber);
-                    String number = work ? c.workNumber : c.privateNumber;
-                    if (Numbers.isEmpty(number)) {
-                        continue;
-                    }
-                    seen.add(c.id);
-                    matches.add(new ContactStore.NumberMatch(c, work, number));
-                }
-            }
-        }
+        List<ContactMatcher.Match> matches = raw.isEmpty()
+                ? Collections.<ContactMatcher.Match>emptyList()
+                : ContactMatcher.match(
+                        ContactStore.get(activity).getAll(ContactStore.SortMode.LAST_NAME), raw, MAX_MATCHES);
         for (int i = 0; i < matchRows.length; i++) {
             TextView row = matchRows[i];
+            if (row == null) {
+                continue;
+            }
             if (i >= matches.size()) {
                 row.setVisibility(View.GONE);
                 row.setOnClickListener(null);
                 row.setClickable(false);
                 continue;
             }
-            final ContactStore.NumberMatch m = matches.get(i);
+            final ContactMatcher.Match m = matches.get(i);
             String name = m.contact.displayName();
             if (name.isEmpty()) {
                 name = activity.getString(R.string.contact_unnamed);

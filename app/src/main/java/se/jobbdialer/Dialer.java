@@ -66,10 +66,13 @@ final class Dialer {
         }
     }
 
-    /** Parses the stored dial mode; anything unknown (or PRIVATE) falls back to INTERNAL. */
+    /**
+     * Parses the stored dial-pane mode: INTERNAL or PATIENT. Anything else (unknown, PRIVATE, or
+     * SWITCHBOARD stored by 1.1's former "Växeln" segment) falls back to INTERNAL.
+     */
     static CallMode parseDialMode(String name) {
         CallMode m = CallMode.parse(name);
-        return m == CallMode.PRIVATE ? CallMode.INTERNAL : m;
+        return m == CallMode.PATIENT ? CallMode.PATIENT : CallMode.INTERNAL;
     }
 
     /** Notified after a call was handed to the phone (directly or via the system dialer). */

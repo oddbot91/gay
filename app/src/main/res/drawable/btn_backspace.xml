@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Backspace button next to the call button: rounded square in the keypad surface colour
+     (night variant via keypad_bg), explicit pressed colour plus a ripple. Mirrors btn_keypad.xml
+     but with the call button's corner radius. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/ripple_neutral">
+    <item>
+        <selector>
+            <item android:state_pressed="true">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/keypad_pressed" />
+                    <corners android:radius="@dimen/button_radius" />
+                </shape>
+            </item>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/keypad_bg" />
+                    <corners android:radius="@dimen/button_radius" />
+                </shape>
+            </item>
+        </selector>
+    </item>
+</ripple>

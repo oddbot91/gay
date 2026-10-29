@@ -37,10 +37,6 @@
     <dimen name="recent_row_min_height">64dp</dimen>
     <dimen name="contact_name_text_size">17sp</dimen>
     <dimen name="contact_number_text_size">15sp</dimen>
-    <dimen name="list_bottom_padding">88dp</dimen>
-    <dimen name="fab_size">56dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
-    <dimen name="fab_elevation">6dp</dimen>
 
     <!-- Settings / dialogs -->
     <dimen name="settings_button_min_height">48dp</dimen>
