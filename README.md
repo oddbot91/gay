@@ -17,7 +17,7 @@ Kräver Android 8.0 (API 26) eller senare.
 | **RING PATIENT** | patientprefix + slaget nummer (standard `#31#` = dolt nummer) | `0701234567` → `#31#0701234567` |
 | **RING VÄXELN** | växelnumret, utan prefix (standard `0313427000`) | → `0313427000` |
 
-- Om numret redan börjar med prefixet läggs prefixet inte till en gång till
+- Om numret redan börjar med prefixet läggs prefixet inte till en gång till. Internprefixet läggs inte heller till om numret är ett fullständigt nummer (börjar med 0 eller + och har minst 8 siffror).
   (`0313430771` → `0313430771`).
 - Under nummerfältet visas en förhandsvisning, t.ex. `Internt → 03134 30771 · Patient → #31# 30771`.
 - Prefixen och växelnumret ändrar du under **Inställningar**. Där finns också
@@ -59,7 +59,7 @@ export/import kan du alltså flytta telefonboken till en ny telefon.
 
 ### Dölj appens samtal i telefonens samtalslogg (valfritt)
 
-Inställningen är **av** från början. Android sparar alltid samtal i telefonens egen
+Inställningen är **av** från början. Vid allra första start frågar appen en gång om du vill slå på den (knappen *Slå på* ber om behörigheten, *Inte nu* lämnar den avstängd); du kan alltid ändra den under Inställningar. Android sparar alltid samtal i telefonens egen
 samtalslogg och har inget sätt att låta bli. När inställningen är på raderar appen därför
 posterna i efterhand.
 
@@ -88,7 +88,7 @@ posterna i efterhand.
 
 ## Installation (sideload)
 
-1. Ladda ner `jobbdialer-*.apk` (se *Bygga* nedan; den färdiga filen finns under GitHub
+1. Ladda ner `Jobbdialer-vX.Y.apk` (se *Bygga* nedan; den färdiga filen finns under GitHub
    Releases eller Actions-artefakter).
 2. Öppna filen på telefonen. Första gången ber Android dig tillåta installation från okänd
    källa för appen du öppnade filen med (t.ex. Filer eller Chrome). Det gör du under
@@ -113,7 +113,7 @@ Det finns tre sätt att bygga appen. Alla tre ger en signerad release-APK (v1 + 
 3. Pusha till `main` eller `master`. Arbetsflödet `.github/workflows/build-apk.yml` kör
    kontrollerna, bygger med `./gradlew assembleRelease` och signerar.
 4. Ladda ner APK-filen under **Actions → (senaste körningen) → Artifacts → `jobbdialer-apk`**
-   (zip-fil; packa upp och installera `.apk`-filen i den).
+   (zip-fil; packa upp och installera `.apk`-filen i den). APK-filen heter `Jobbdialer-vX.Y.apk` (versionsnumret hämtas från `versionName`).
 5. Om du pushar en tagg som börjar med `v`, t.ex. `git tag v1.0 && git push origin v1.0`,
    skapas också en **GitHub Release** med APK-filen bifogad direkt som nedladdning.
 

@@ -105,7 +105,7 @@ final class Dialer {
 
     /**
      * The number that is actually dialed for {@code input} in {@code mode}:
-     * INTERNAL = prefixInternal + input (unless the input already starts with the prefix),
+     * INTERNAL = prefixInternal + input (unless the input already starts with the prefix or is a full number),
      * PATIENT = prefixPatient + input (likewise not doubled), SWITCHBOARD = switchboard number,
      * PRIVATE = input as-is. Spaces, dashes etc. are removed. Returns "" when there is nothing to dial.
      */
@@ -113,9 +113,9 @@ final class Dialer {
         String n = Numbers.clean(input);
         switch (mode) {
             case INTERNAL:
-                return withPrefix(prefs.getPrefixInternal(), n);
+                return withPrefix(prefs.getPrefixInternal(), n, true);
             case PATIENT:
-                return withPrefix(prefs.getPrefixPatient(), n);
+                return withPrefix(prefs.getPrefixPatient(), n, false);
             case SWITCHBOARD:
                 return Numbers.clean(prefs.getSwitchboardNumber());
             case PRIVATE:
@@ -124,9 +124,12 @@ final class Dialer {
         }
     }
 
-    private static String withPrefix(String prefix, String cleanedInput) {
+    private static String withPrefix(String prefix, String cleanedInput, boolean skipFullNumbers) {
         if (cleanedInput.isEmpty()) {
             return "";
+        }
+        if (skipFullNumbers && Numbers.isFullNumber(cleanedInput)) {
+            return cleanedInput;
         }
         String p = Numbers.clean(prefix);
         if (p.isEmpty() || cleanedInput.startsWith(p)) {

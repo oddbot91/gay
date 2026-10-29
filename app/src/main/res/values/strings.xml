@@ -124,7 +124,7 @@
     <string name="cd_navigate_up">Tillbaka</string>
     <string name="settings_section_numbers">Nummer</string>
     <string name="label_prefix_internal">Prefix för internsamtal</string>
-    <string name="help_prefix_internal">Läggs före numret när du trycker på Ring internt, t.ex. 03134 + 30771. Läggs inte till om numret redan börjar med prefixet.</string>
+    <string name="help_prefix_internal">Läggs före numret när du trycker på Ring internt, t.ex. 03134 + 30771. Läggs inte till om numret redan börjar med prefixet eller är ett fullständigt nummer (börjar med 0 eller + och har minst 8 siffror).</string>
     <string name="label_prefix_patient">Prefix för patientsamtal</string>
     <string name="help_prefix_patient">Läggs före numret när du trycker på Ring patient. #31# döljer ditt nummer för mottagaren.</string>
     <string name="label_switchboard">Växelnummer</string>
@@ -140,6 +140,11 @@
     <string name="hide_call_log_dialog_title">Dölj samtal i samtalsloggen</string>
     <string name="hide_call_log_dialog_message">För att kunna radera appens samtal ur telefonens samtalslogg behöver Jobbdialer behörighet att läsa och ändra samtalsloggen.\n\nAppen raderar bara samtal som har ringts från appen. Inga uppgifter lämnar telefonen.</string>
     <string name="hide_call_log_denied">Behörigheten nekades – inställningen stängdes av.</string>
+    <string name="call_log_prompt_title">Dölj appens samtal i telefonens samtalslogg?</string>
+    <string name="call_log_prompt_message">Samtal som ringts från Jobbdialer kan raderas ur telefonens vanliga samtalslogg efteråt, så att jobbsamtal och privata samtal hålls isär. Det kräver behörighet att läsa och ändra samtalsloggen. Appen raderar bara sina egna samtal och inga uppgifter lämnar telefonen.\n\nDu kan ändra detta när som helst under Inställningar.</string>
+    <string name="call_log_prompt_enable">Slå på</string>
+    <string name="call_log_prompt_later">Inte nu</string>
+    <string name="call_log_prompt_denied">Inställningen är kvar avstängd. Du kan slå på den under Inställningar.</string>
     <string name="hide_call_log_enabled">Appens samtal raderas nu ur samtalsloggen.</string>
     <string name="permission_denied_title">Behörighet saknas</string>
     <string name="permission_denied_call_log_message">Behörigheten för samtalsloggen är nekad. Du kan ge den under Appinfo → Behörigheter och sedan slå på inställningen igen.</string>

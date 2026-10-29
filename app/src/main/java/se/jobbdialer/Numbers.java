@@ -36,6 +36,20 @@ final class Numbers {
         return b.toString();
     }
 
+    /**
+     * True when the cleaned number is a complete national/international number, not a PBX
+     * extension: it starts with "+", or starts with "0" and has at least 8 digits.
+     */
+    static boolean isFullNumber(String cleaned) {
+        if (cleaned == null || cleaned.isEmpty()) {
+            return false;
+        }
+        if (cleaned.startsWith("+")) {
+            return true;
+        }
+        return cleaned.startsWith("0") && digitsOnly(cleaned).length() >= 8;
+    }
+
     /** Keeps ASCII digits only. */
     static String digitsOnly(String s) {
         if (s == null) {
@@ -212,8 +226,19 @@ final class Numbers {
      * the input already starts with it ("0313430771" → "03134 30771").
      */
     static String previewWithPrefix(String prefix, String input) {
+        return previewWithPrefix(prefix, input, false);
+    }
+
+    /**
+     * Like {@link #previewWithPrefix(String, String)}; with {@code skipFullNumbers} a complete
+     * number (see {@link #isFullNumber}) is shown without the prefix.
+     */
+    static String previewWithPrefix(String prefix, String input, boolean skipFullNumbers) {
         String p = clean(prefix);
         String n = clean(input);
+        if (skipFullNumbers && isFullNumber(n)) {
+            return n;
+        }
         if (!p.isEmpty() && n.startsWith(p)) {
             return joinForPreview(p, n.substring(p.length()));
         }

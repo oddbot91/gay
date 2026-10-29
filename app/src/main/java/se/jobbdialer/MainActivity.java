@@ -1,9 +1,13 @@
 package se.jobbdialer;
 
+import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.ActivityNotFoundException;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
@@ -97,8 +101,36 @@ public class MainActivity extends Activity {
         showTab(tab);
 
         if (savedInstanceState == null) {
-            handleShortcutIntent(getIntent());
+            Intent startIntent = getIntent();
+            boolean switchboardShortcut = startIntent != null
+                    && ACTION_CALL_SWITCHBOARD.equals(startIntent.getAction());
+            handleShortcutIntent(startIntent);
+            if (!switchboardShortcut && !prefs.isCallLogPromptShown() && !prefs.isHideInCallLog()) {
+                prefs.setCallLogPromptShown(true);
+                showCallLogPrompt();
+            }
         }
+    }
+
+    /** One-time offer (first start) to enable hiding the app's calls in the phone call log. */
+    private void showCallLogPrompt() {
+        if (isFinishing() || isDestroyed()) {
+            return;
+        }
+        new AlertDialog.Builder(this)
+                .setTitle(R.string.call_log_prompt_title)
+                .setMessage(R.string.call_log_prompt_message)
+                .setPositiveButton(R.string.call_log_prompt_enable, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        requestPermissions(new String[]{
+                                Manifest.permission.READ_CALL_LOG,
+                                Manifest.permission.WRITE_CALL_LOG}, Dialer.REQUEST_CALL_LOG);
+                    }
+                })
+                .setNegativeButton(R.string.call_log_prompt_later, null)
+                .setCancelable(true)
+                .show();
     }
 
     @Override
@@ -126,6 +158,24 @@ public class MainActivity extends Activity {
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == Dialer.REQUEST_CALL_LOG) {
+            if (grantResults == null || grantResults.length == 0) {
+                return; // interrupted request
+            }
+            boolean granted = true;
+            for (int r : grantResults) {
+                if (r != PackageManager.PERMISSION_GRANTED) {
+                    granted = false;
+                }
+            }
+            if (granted && CallLogCleaner.hasPermissions(this)) {
+                prefs.setHideInCallLog(true);
+                Toast.makeText(this, R.string.hide_call_log_enabled, Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(this, R.string.call_log_prompt_denied, Toast.LENGTH_LONG).show();
+            }
+            return;
+        }
         if (!dialer.onRequestPermissionsResult(requestCode, permissions, grantResults)) {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }

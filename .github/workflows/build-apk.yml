@@ -26,6 +26,8 @@ permissions:
 env:
   BUILD_TOOLS_VERSION: '35.0.0'
   COMPILE_SDK: '35'
+  # SHA-256 fingerprint of the release certificate (lowercase hex, no colons). Public information.
+  EXPECTED_CERT_SHA256: '14e0ca9f61e8ee74263217ca95212f59a6be669915d99a88c0060c9e0ca7d9ac'
 
 jobs:
   build:
@@ -127,6 +129,7 @@ jobs:
             echo "KEYSTORE_PASSWORD=$keystore_password"
             echo "KEY_ALIAS=$key_alias"
             echo "KEY_PASSWORD=$key_password"
+            echo "TEMPORARY_KEY=$temporary_key"
           } >> "$GITHUB_ENV"
 
       - name: Make Gradle wrapper executable
@@ -134,6 +137,21 @@ jobs:
 
       - name: Build release APK
         run: ./gradlew --no-daemon --stacktrace assembleRelease
+
+      - name: Rename APK
+        run: |
+          set -euo pipefail
+          version="$(grep -oE 'versionName *= *"[^"]+"' app/build.gradle.kts | head -n1 | sed -E 's/.*"([^"]+)"/\1/' || true)"
+          version="${version:-1.0}"
+          src="app/build/outputs/apk/release/app-release.apk"
+          if [ ! -f "$src" ]; then
+            echo "::error::$src not found"
+            ls -R app/build/outputs || true
+            exit 1
+          fi
+          mv "$src" "app/build/outputs/apk/release/Jobbdialer-v${version}.apk"
+          echo "APK_NAME=Jobbdialer-v${version}.apk" >> "$GITHUB_ENV"
+          echo "Renamed to Jobbdialer-v${version}.apk"
 
       - name: Verify APK signature
         run: |
@@ -151,7 +169,27 @@ jobs:
           fi
           for apk in "${apks[@]}"; do
             echo "--- $apk ($(du -h "$apk" | cut -f1))"
-            "$apksigner" verify --verbose --print-certs "$apk"
+            out="$("$apksigner" verify --verbose --print-certs "$apk")"
+            printf '%s\n' "$out"
+            digest="$(printf '%s\n' "$out" | sed -n 's/^Signer #1 certificate SHA-256 digest: *//p' | head -n1 | tr -d '[:space:]' | tr 'A-F' 'a-f')"
+            [ -n "$digest" ] || { echo "::error::Could not read the signer certificate SHA-256 digest of $apk"; exit 1; }
+            if [ "${TEMPORARY_KEY:-no}" = no ]; then
+              if [ "$digest" != "$EXPECTED_CERT_SHA256" ]; then
+                echo "::error::APK is not signed with the expected release key (got $digest, expected $EXPECTED_CERT_SHA256)"
+                exit 1
+              fi
+              echo "Signed with the expected release key"
+              key_note="expected release key"
+            else
+              echo "::warning::Signed with a temporary key (certificate SHA-256 $digest)"
+              key_note="temporary key (not the release key)"
+            fi
+            {
+              echo "### APK certificate"
+              echo "- File: \`$(basename "$apk")\`"
+              echo "- SHA-256: \`$digest\`"
+              echo "- Key: $key_note"
+            } >> "$GITHUB_STEP_SUMMARY"
           done
 
       - name: Upload APK artifact

@@ -182,7 +182,7 @@ final class DialPane {
             preview.setVisibility(View.GONE);
         } else {
             preview.setText(activity.getString(R.string.preview_format,
-                    Numbers.previewWithPrefix(prefs.getPrefixInternal(), raw),
+                    Numbers.previewWithPrefix(prefs.getPrefixInternal(), raw, true),
                     Numbers.previewWithPrefix(prefs.getPrefixPatient(), raw)));
             preview.setVisibility(View.VISIBLE);
         }

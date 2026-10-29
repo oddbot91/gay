@@ -431,7 +431,7 @@ final class ContactStore {
      */
     private static List<Contact> parseContacts(String text) throws JSONException {
         String t = text.trim();
-        if (t.startsWith("﻿")) {
+        if (t.startsWith("\ufeff")) {
             t = t.substring(1);
         }
         JSONArray arr;

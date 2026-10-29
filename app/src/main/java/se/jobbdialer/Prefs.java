@@ -13,6 +13,7 @@ final class Prefs {
     static final String KEY_SWITCHBOARD = "switchboard_number";
     static final String KEY_CONTACT_SORT = "contact_sort";
     static final String KEY_HIDE_IN_CALL_LOG = "hide_in_call_log";
+    static final String KEY_CALL_LOG_PROMPT_SHOWN = "call_log_prompt_shown";
     static final String KEY_PENDING_CLEANUP = "pending_cleanup_json";
 
     static final String DEFAULT_PREFIX_INTERNAL = "03134";
@@ -80,6 +81,14 @@ final class Prefs {
 
     void setHideInCallLog(boolean value) {
         sp.edit().putBoolean(KEY_HIDE_IN_CALL_LOG, value).apply();
+    }
+
+    boolean isCallLogPromptShown() {
+        return sp.getBoolean(KEY_CALL_LOG_PROMPT_SHOWN, false);
+    }
+
+    void setCallLogPromptShown(boolean value) {
+        sp.edit().putBoolean(KEY_CALL_LOG_PROMPT_SHOWN, value).apply();
     }
 
     String getPendingCleanupJson() {
