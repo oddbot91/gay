@@ -114,7 +114,7 @@ Det finns tre sätt att bygga appen. Alla tre ger en signerad release-APK (v1 + 
    kontrollerna, bygger med `./gradlew assembleRelease` och signerar.
 4. Ladda ner APK-filen under **Actions → (senaste körningen) → Artifacts → `jobbdialer-apk`**
    (zip-fil; packa upp och installera `.apk`-filen i den). APK-filen heter `Jobbdialer-vX.Y.apk` (versionsnumret hämtas från `versionName`).
-5. Om du pushar en tagg som börjar med `v`, t.ex. `git tag v1.0 && git push origin v1.0`,
+5. Varje bygge på `main` publicerar dessutom APK-filen under **Releases** (https://github.com/oddbot91/gay/releases/latest) som direkt nedladdning.
    skapas också en **GitHub Release** med APK-filen bifogad direkt som nedladdning.
 
 ### 2. Android Studio / Gradle lokalt

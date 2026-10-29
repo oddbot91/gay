@@ -151,6 +151,7 @@ jobs:
           fi
           mv "$src" "app/build/outputs/apk/release/Jobbdialer-v${version}.apk"
           echo "APK_NAME=Jobbdialer-v${version}.apk" >> "$GITHUB_ENV"
+          echo "APP_VERSION=${version}" >> "$GITHUB_ENV"
           echo "Renamed to Jobbdialer-v${version}.apk"
 
       - name: Verify APK signature
@@ -199,10 +200,19 @@ jobs:
           path: app/build/outputs/apk/release/*.apk
           if-no-files-found: error
 
-      - name: Create GitHub Release (tags v*)
-        if: startsWith(github.ref, 'refs/tags/v')
+      # A Release gives a stable download link (…/releases/latest) without unzipping artifacts.
+      # On pushes to main the release is named after versionName (v1.0, v1.1, …) and its APK is
+      # replaced by every build with that version; a pushed tag v* publishes under that tag.
+      # Skipped for temporary-key builds so no throwaway-signed APK ends up under Releases.
+      - name: Publish GitHub Release
+        if: env.TEMPORARY_KEY == 'no' && (startsWith(github.ref, 'refs/tags/v') || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('v{0}', env.APP_VERSION) }}
+          name: Jobbdialer ${{ startsWith(github.ref, 'refs/tags/v') && github.ref_name || format('v{0}', env.APP_VERSION) }}
+          body: |
+            Signerad release-APK för sidladdning. Ladda ner `${{ env.APK_NAME }}` nedan och öppna filen på telefonen.
+            Byggd från ${{ github.sha }}.
           files: app/build/outputs/apk/release/*.apk
           fail_on_unmatched_files: true
-          generate_release_notes: true
+          make_latest: true
