@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One keypad suggestion: contact icon, "Namn · Jobb 30771". Inflated by DialPane. -->
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/match_row_height"
+    android:gravity="center_vertical"
+    android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:paddingLeft="@dimen/space_small"
+    android:paddingRight="@dimen/space_small"
+    android:paddingTop="@dimen/space_tiny"
+    android:paddingBottom="@dimen/space_tiny"
+    android:drawableStart="@drawable/ic_contact"
+    android:drawableTint="@color/brand_text"
+    android:drawablePadding="@dimen/space_medium"
+    android:maxLines="1"
+    android:ellipsize="end"
+    android:textSize="@dimen/contact_number_text_size"
+    android:textColor="?android:attr/textColorPrimary" />

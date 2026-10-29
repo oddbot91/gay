@@ -6,9 +6,12 @@ import java.util.Locale;
 final class T9 {
 
     /** Letters per key, index = digit (0 = space, 1 = none). */
+    // Non-ASCII letters written as unicode escapes (backslash-u) so the mapping cannot depend on the
+    // compiler's source encoding: 00e5 = a-ring, 00e4 = a-umlaut, 00e9 = e-acute, 00f6 = o-umlaut.
     static final String[] KEYS = {" ", "", "abcåä", "defé", "ghi", "jkl", "mnoö", "pqrs", "tuv", "wxyz"};
 
     /** Extra diacritics that fall back to the key of their base letter. */
+    // é→3, ü→8, ø→6, æ→2 (pairs of letter + digit)
     private static final String EXTRAS = "é3ü8ø6æ2";
 
     private static final Locale SV = Locale.forLanguageTag("sv-SE");

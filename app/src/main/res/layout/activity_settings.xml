@@ -125,6 +125,12 @@
                 style="@style/SettingsHelp"
                 android:layout_marginTop="@dimen/space_large"
                 android:gravity="center" />
+
+            <!-- Runtime self-test of the T9 letter table (shows whether å/ä/ö map correctly). -->
+            <TextView
+                android:id="@+id/t9_selftest"
+                style="@style/SettingsHelp"
+                android:gravity="center" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

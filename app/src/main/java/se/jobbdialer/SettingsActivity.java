@@ -91,6 +91,13 @@ public class SettingsActivity extends Activity {
 
         TextView version = findViewById(R.id.version);
         version.setText(getString(R.string.settings_version, versionName()));
+
+        // Runtime self-test of the T9 table: "Bögen" must map to 26436 (b=2, ö=6, g=4, e=3, n=6).
+        TextView selfTest = findViewById(R.id.t9_selftest);
+        String digits = T9.toDigits("Bögen");
+        boolean ok = "26436".equals(digits) && T9.matchesName("Bögen", "", "26436");
+        selfTest.setText(getString(R.string.t9_selftest, digits, ok ? "✓" : "✗",
+                ContactStore.get(this).size()));
     }
 
     @Override

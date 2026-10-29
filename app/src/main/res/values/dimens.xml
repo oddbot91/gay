@@ -12,7 +12,7 @@
     <dimen name="number_text_size">30sp</dimen>
     <dimen name="preview_text_size">14sp</dimen>
     <dimen name="icon_button_size">48dp</dimen>
-    <dimen name="match_row_height">34dp</dimen>
+    <dimen name="match_row_height">40dp</dimen>
     <dimen name="key_height">50dp</dimen>
     <dimen name="key_gap">3dp</dimen>
     <dimen name="key_corner_radius">26dp</dimen>

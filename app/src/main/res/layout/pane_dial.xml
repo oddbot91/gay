@@ -37,25 +37,14 @@
             android:layout_height="1dp"
             android:background="@color/divider" />
 
-        <TextView
-            android:id="@+id/match_1"
-            style="@style/MatchRow" />
-
-        <TextView
-            android:id="@+id/match_2"
-            style="@style/MatchRow" />
-
-        <TextView
-            android:id="@+id/match_3"
-            style="@style/MatchRow" />
-
-        <TextView
-            android:id="@+id/match_4"
-            style="@style/MatchRow" />
-
-        <TextView
-            android:id="@+id/match_5"
-            style="@style/MatchRow" />
+        <!-- Contact suggestions (T9 names + numbers). Rows are inflated from row_match.xml in
+             code (DialPane.updateMatches); the container is GONE while there are no matches. -->
+        <LinearLayout
+            android:id="@+id/match_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone" />
 
         <View
             android:layout_width="match_parent"

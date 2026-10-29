@@ -26,6 +26,12 @@ public final class T9Test {
     public static void main(String[] args) {
         // ---------------------------------------------------------------- T9.toDigits
         eq("toDigits(Irshad)", "477423", T9.toDigits("Irshad"));
+        // User-reported case: "Bögen" must be found with 264 and 26436 (b=2, ö=6, g=4, e=3, n=6).
+        eq("toDigits(Bögen)", "26436", T9.toDigits("Bögen"));
+        yes("Bögen '264'", T9.matchesName("Bögen", "", "264"));
+        yes("Bögen '26436' as last name", T9.matchesName("", "Bögen", "26436"));
+        yes("Bögen '26436' via ContactMatcher", !ContactMatcher.match(
+                java.util.Arrays.asList(new Contact(null, "Bögen", "", "30555", "")), "26436", 5).isEmpty());
         eq("toDigits(Åsa Öberg)", "272062374", T9.toDigits("Åsa Öberg"));
         eq("toDigits(Anna Andersson)", "26620263377766", T9.toDigits("Anna Andersson"));
         eq("toDigits(ÄÉÜ upper case)", "238", T9.toDigits("ÄÉÜ"));

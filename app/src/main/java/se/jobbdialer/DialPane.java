@@ -5,8 +5,10 @@ import android.graphics.Color;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.HapticFeedbackConstants;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.Collections;
@@ -30,7 +32,8 @@ final class DialPane {
 
     private final MainActivity activity;
     private final EditText numberField;
-    private final TextView[] matchRows;
+    /** Holds the suggestion rows (row_match.xml), created in code; GONE when there are none. */
+    private final LinearLayout matchContainer;
     private final TextView[] segments;
     private final Dialer.CallMode[] segmentModes = {
             Dialer.CallMode.INTERNAL, Dialer.CallMode.PATIENT};
@@ -42,12 +45,7 @@ final class DialPane {
     DialPane(MainActivity activity, View root) {
         this.activity = activity;
         numberField = root.findViewById(R.id.number_field);
-        matchRows = new TextView[]{
-                root.findViewById(R.id.match_1),
-                root.findViewById(R.id.match_2),
-                root.findViewById(R.id.match_3),
-                root.findViewById(R.id.match_4),
-                root.findViewById(R.id.match_5)};
+        matchContainer = root.findViewById(R.id.match_container);
         segments = new TextView[]{
                 root.findViewById(R.id.seg_internal),
                 root.findViewById(R.id.seg_patient)};
@@ -229,24 +227,27 @@ final class DialPane {
                 activity.getColor(enabled ? colorRes : R.color.btn_disabled)));
     }
 
-    /** Shows up to {@link #MAX_MATCHES} keypad matches (all matching logic is in ContactMatcher). */
+    /**
+     * Shows up to {@link #MAX_MATCHES} keypad matches (all matching logic is in ContactMatcher).
+     * The rows are inflated from row_match.xml and (re)created on every change, so nothing depends
+     * on pre-existing views or style inheritance.
+     */
     private void updateMatches(String raw) {
         List<ContactMatcher.Match> matches = raw.isEmpty()
                 ? Collections.<ContactMatcher.Match>emptyList()
                 : ContactMatcher.match(
                         ContactStore.get(activity).getAll(ContactStore.SortMode.LAST_NAME), raw, MAX_MATCHES);
-        for (int i = 0; i < matchRows.length; i++) {
-            TextView row = matchRows[i];
-            if (row == null) {
-                continue;
-            }
-            if (i >= matches.size()) {
-                row.setVisibility(View.GONE);
-                row.setOnClickListener(null);
-                row.setClickable(false);
-                continue;
-            }
-            final ContactMatcher.Match m = matches.get(i);
+        if (matchContainer == null) {
+            return;
+        }
+        matchContainer.removeAllViews();
+        if (matches.isEmpty()) {
+            matchContainer.setVisibility(View.GONE);
+            return;
+        }
+        LayoutInflater inflater = LayoutInflater.from(activity);
+        for (final ContactMatcher.Match m : matches) {
+            TextView row = (TextView) inflater.inflate(R.layout.row_match, matchContainer, false);
             String name = m.contact.displayName();
             if (name.isEmpty()) {
                 name = activity.getString(R.string.contact_unnamed);
@@ -260,7 +261,8 @@ final class DialPane {
                     numberField.setSelection(numberField.length());
                 }
             });
-            row.setVisibility(View.VISIBLE);
+            matchContainer.addView(row);
         }
+        matchContainer.setVisibility(View.VISIBLE);
     }
 }
