@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- RING INTERNT button background (primary blue).
+     Rounded rectangle with explicit pressed/disabled colours plus a ripple, so the button looks
+     the same on every manufacturer's theme. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/ripple_on_color">
+    <item>
+        <selector>
+            <item android:state_enabled="false">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/btn_disabled" />
+                    <corners android:radius="@dimen/button_radius" />
+                </shape>
+            </item>
+            <item android:state_pressed="true">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/primary_pressed" />
+                    <corners android:radius="@dimen/button_radius" />
+                </shape>
+            </item>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/primary" />
+                    <corners android:radius="@dimen/button_radius" />
+                </shape>
+            </item>
+        </selector>
+    </item>
+</ripple>

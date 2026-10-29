@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Dark mode surfaces. Brand colours for filled buttons stay the same (white text on them). -->
+    <color name="window_bg">#FF121212</color>
+    <color name="surface_bar">#FF1E1E1E</color>
+    <color name="divider">#1FFFFFFF</color>
+    <color name="keypad_bg">#FF262A2F</color>
+    <color name="keypad_pressed">#FF363C44</color>
+    <color name="ripple_neutral">#33FFFFFF</color>
+    <color name="btn_disabled">#FF4A4A4A</color>
+    <color name="outline">#FF82B1FF</color>
+    <color name="outline_pressed_bg">#2982B1FF</color>
+
+    <!-- Lighter tints so text and icons keep enough contrast on dark surfaces. -->
+    <color name="brand_text">#FF82B1FF</color>
+    <color name="tab_selected">#FF82B1FF</color>
+    <color name="tab_unselected">#FFA0A0A0</color>
+
+    <color name="mode_internal">#FF82B1FF</color>
+    <color name="mode_patient">#FFCE93D8</color>
+    <color name="mode_switchboard">#FF81C784</color>
+    <color name="mode_private">#FFFFB74D</color>
+</resources>

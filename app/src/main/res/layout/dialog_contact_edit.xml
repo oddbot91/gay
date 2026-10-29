@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Add/edit contact dialog body. -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingLeft="@dimen/dialog_padding_h"
+        android:paddingTop="@dimen/space_small"
+        android:paddingRight="@dimen/dialog_padding_h">
+
+        <TextView
+            style="@style/DialogLabel"
+            android:labelFor="@+id/edit_first_name"
+            android:text="@string/label_first_name" />
+
+        <EditText
+            android:id="@+id/edit_first_name"
+            style="@style/DialogField"
+            android:hint="@string/hint_first_name"
+            android:inputType="textPersonName|textCapWords" />
+
+        <TextView
+            style="@style/DialogLabel"
+            android:labelFor="@+id/edit_last_name"
+            android:text="@string/label_last_name" />
+
+        <EditText
+            android:id="@+id/edit_last_name"
+            style="@style/DialogField"
+            android:hint="@string/hint_last_name"
+            android:inputType="textPersonName|textCapWords" />
+
+        <TextView
+            style="@style/DialogLabel"
+            android:labelFor="@+id/edit_work_number"
+            android:text="@string/label_work_number" />
+
+        <EditText
+            android:id="@+id/edit_work_number"
+            style="@style/DialogField"
+            android:hint="@string/hint_work_number"
+            android:inputType="phone" />
+
+        <TextView
+            style="@style/DialogLabel"
+            android:labelFor="@+id/edit_private_number"
+            android:text="@string/label_private_number" />
+
+        <EditText
+            android:id="@+id/edit_private_number"
+            style="@style/DialogField"
+            android:hint="@string/hint_private_number"
+            android:imeOptions="actionDone"
+            android:inputType="phone" />
+    </LinearLayout>
+</ScrollView>

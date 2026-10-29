@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One history entry: mode-coloured handset, name or number, then "mode · number · time". -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:minHeight="@dimen/recent_row_min_height"
+    android:orientation="horizontal"
+    android:paddingLeft="@dimen/row_padding_h"
+    android:paddingTop="@dimen/row_padding_v"
+    android:paddingRight="@dimen/row_padding_h"
+    android:paddingBottom="@dimen/row_padding_v">
+
+    <ImageView
+        android:id="@+id/recent_icon"
+        android:layout_width="@dimen/recent_icon_size"
+        android:layout_height="@dimen/recent_icon_size"
+        android:layout_marginEnd="@dimen/pane_padding"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_phone" />
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/recent_line1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/recent_line2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="?android:attr/textColorSecondary"
+            android:textSize="13sp" />
+    </LinearLayout>
+</LinearLayout>

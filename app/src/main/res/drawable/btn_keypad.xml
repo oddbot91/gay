@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Keypad key background: a rounded "pill" (the corner radius is clamped to half the key height,
+     so it stays round whatever size the weighted grid gives the key). Neutral surface colour with
+     a night variant, explicit pressed colour plus a ripple. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/ripple_neutral">
+    <item>
+        <selector>
+            <item android:state_pressed="true">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/keypad_pressed" />
+                    <corners android:radius="@dimen/key_corner_radius" />
+                </shape>
+            </item>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/keypad_bg" />
+                    <corners android:radius="@dimen/key_corner_radius" />
+                </shape>
+            </item>
+        </selector>
+    </item>
+</ripple>

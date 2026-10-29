@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Text and icon colour of the bottom tabs; the active tab is marked with setSelected(true). -->
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:color="@color/tab_selected" android:state_selected="true" />
+    <item android:color="@color/tab_unselected" />
+</selector>

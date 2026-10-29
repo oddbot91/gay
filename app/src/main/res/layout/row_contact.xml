@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- One phone book entry: bold name, then tappable "Jobb ..." / "Privat ..." rows (gone when empty). -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingLeft="@dimen/row_padding_h"
+    android:paddingTop="@dimen/row_padding_v"
+    android:paddingRight="@dimen/row_padding_h"
+    android:paddingBottom="@dimen/row_padding_v">
+
+    <TextView
+        android:id="@+id/contact_name"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingLeft="@dimen/space_tiny"
+        android:paddingRight="@dimen/space_tiny"
+        android:paddingBottom="@dimen/space_tiny"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:textColor="?android:attr/textColorPrimary"
+        android:textSize="@dimen/contact_name_text_size"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:id="@+id/work_row"
+        style="@style/ContactSubRow">
+
+        <ImageView
+            style="@style/ContactSubRowIcon"
+            android:src="@drawable/ic_phone_small"
+            android:tint="@color/mode_internal" />
+
+        <TextView
+            android:id="@+id/work_text"
+            style="@style/ContactSubRowText" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/private_row"
+        style="@style/ContactSubRow">
+
+        <ImageView
+            style="@style/ContactSubRowIcon"
+            android:src="@drawable/ic_phone_small"
+            android:tint="@color/mode_private" />
+
+        <TextView
+            android:id="@+id/private_text"
+            style="@style/ContactSubRowText" />
+    </LinearLayout>
+</LinearLayout>

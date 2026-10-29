@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spacing -->
+    <dimen name="pane_padding">16dp</dimen>
+    <dimen name="space_tiny">4dp</dimen>
+    <dimen name="space_small">8dp</dimen>
+    <dimen name="space_medium">12dp</dimen>
+    <dimen name="space_large">24dp</dimen>
+
+    <!-- Dial pane -->
+    <dimen name="number_row_height">64dp</dimen>
+    <dimen name="number_text_size">30sp</dimen>
+    <dimen name="preview_text_size">14sp</dimen>
+    <dimen name="icon_button_size">48dp</dimen>
+    <dimen name="match_row_height">40dp</dimen>
+    <dimen name="key_height">52dp</dimen>
+    <dimen name="key_gap">3dp</dimen>
+    <dimen name="key_corner_radius">26dp</dimen>
+    <dimen name="key_text_size">28sp</dimen>
+    <dimen name="call_button_min_height">56dp</dimen>
+    <dimen name="call_button_gap">6dp</dimen>
+    <dimen name="button_radius">12dp</dimen>
+    <dimen name="call_title_text_size">15sp</dimen>
+    <dimen name="call_subtitle_text_size">13sp</dimen>
+
+    <!-- Main window -->
+    <dimen name="toolbar_elevation">4dp</dimen>
+    <dimen name="tab_bar_height">56dp</dimen>
+    <dimen name="tab_text_size">12sp</dimen>
+
+    <!-- Lists -->
+    <dimen name="row_padding_h">16dp</dimen>
+    <dimen name="row_padding_v">8dp</dimen>
+    <dimen name="row_sub_min_height">44dp</dimen>
+    <dimen name="row_icon_size">20dp</dimen>
+    <dimen name="recent_icon_size">24dp</dimen>
+    <dimen name="recent_row_min_height">64dp</dimen>
+    <dimen name="contact_name_text_size">17sp</dimen>
+    <dimen name="contact_number_text_size">15sp</dimen>
+    <dimen name="list_bottom_padding">88dp</dimen>
+    <dimen name="fab_size">56dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="fab_elevation">6dp</dimen>
+
+    <!-- Settings / dialogs -->
+    <dimen name="settings_button_min_height">48dp</dimen>
+    <dimen name="outline_width">1dp</dimen>
+    <dimen name="dialog_padding_h">24dp</dimen>
+</resources>

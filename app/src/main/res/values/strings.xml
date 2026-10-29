@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Jobbdialer</string>
+
+    <!-- Bottom tabs -->
+    <string name="tab_dial">Ring</string>
+    <string name="tab_contacts">Kontakter</string>
+    <string name="tab_recents">Senaste</string>
+
+    <!-- Overflow menu -->
+    <string name="menu_settings">Inställningar</string>
+    <string name="menu_export">Exportera kontakter</string>
+    <string name="menu_import">Importera kontakter</string>
+
+    <!-- Dial pane -->
+    <string name="number_hint">Ange nummer</string>
+    <string name="cd_backspace">Radera (håll in för att rensa)</string>
+    <string name="cd_key_zero">0 (håll in för plus)</string>
+    <string name="cd_key_star">Stjärna</string>
+    <string name="cd_key_hash">Fyrkant</string>
+    <string name="call_internal">RING INTERNT</string>
+    <string name="call_patient">RING PATIENT</string>
+    <string name="call_patient_sub">dolt nummer</string>
+    <string name="call_switchboard">RING VÄXELN</string>
+    <string name="switchboard_not_set">inget nummer inställt</string>
+    <string name="preview_format">Internt → %1$s · Patient → %2$s</string>
+    <string name="match_work">%1$s · Jobb %2$s</string>
+    <string name="match_private">%1$s · Privat %2$s</string>
+
+    <!-- Keypad labels (not translated) -->
+    <string name="key_1" translatable="false">1</string>
+    <string name="key_2" translatable="false">2</string>
+    <string name="key_3" translatable="false">3</string>
+    <string name="key_4" translatable="false">4</string>
+    <string name="key_5" translatable="false">5</string>
+    <string name="key_6" translatable="false">6</string>
+    <string name="key_7" translatable="false">7</string>
+    <string name="key_8" translatable="false">8</string>
+    <string name="key_9" translatable="false">9</string>
+    <string name="key_0" translatable="false">0</string>
+    <string name="key_star" translatable="false">*</string>
+    <string name="key_hash" translatable="false">#</string>
+
+    <!-- Contacts pane -->
+    <string name="search_hint">Sök namn eller nummer</string>
+    <string name="sort_button">Sortera: %1$s</string>
+    <string name="sort_title">Sortera kontakter</string>
+    <string name="sort_last_name">Efternamn</string>
+    <string name="sort_first_name">Förnamn</string>
+    <string name="sort_work_number">Jobbnr</string>
+    <string name="sort_private_number">Privatnr</string>
+    <string name="contacts_empty">Inga kontakter ännu.\nTryck på + för att lägga till en.</string>
+    <string name="contacts_no_match">Inga kontakter matchar sökningen.</string>
+    <string name="cd_add_contact">Lägg till kontakt</string>
+    <string name="contact_work_line">Jobb %1$s</string>
+    <string name="contact_private_line">Privat %1$s</string>
+    <string name="contact_unnamed">(namnlös)</string>
+    <string name="action_call_private_hidden">Ring privat med dolt nummer (%1$s)</string>
+    <string name="action_call_private_hidden_plain">Ring privat med dolt nummer</string>
+    <string name="action_edit">Redigera</string>
+    <string name="action_delete">Ta bort</string>
+    <string name="dialog_add_contact_title">Ny kontakt</string>
+    <string name="dialog_edit_contact_title">Redigera kontakt</string>
+    <string name="label_first_name">Förnamn</string>
+    <string name="label_last_name">Efternamn</string>
+    <string name="label_work_number">Jobbnr (kortnummer)</string>
+    <string name="label_private_number">Privatnr</string>
+    <string name="hint_first_name">t.ex. Anna</string>
+    <string name="hint_last_name">t.ex. Andersson</string>
+    <string name="hint_work_number">t.ex. 30771</string>
+    <string name="hint_private_number">t.ex. 070-444 44 44</string>
+    <string name="save">Spara</string>
+    <string name="cancel">Avbryt</string>
+    <string name="contact_empty_error">Fyll i minst ett namn eller ett nummer.</string>
+    <string name="confirm_delete_contact">Ta bort %1$s?</string>
+    <string name="contact_deleted">Kontakten togs bort.</string>
+    <string name="save_failed">Kunde inte spara. Försök igen.</string>
+
+    <!-- Recents pane -->
+    <string name="recents_empty">Inga samtal ännu.\nSamtal som du ringer från appen visas här.</string>
+    <string name="mode_internal">Internt</string>
+    <string name="mode_patient">Patient</string>
+    <string name="mode_switchboard">Växeln</string>
+    <string name="mode_private">Privat</string>
+    <string name="recent_detail_with_number">%1$s · %2$s · %3$s</string>
+    <string name="recent_detail">%1$s · %2$s</string>
+    <string name="time_just_now">Nyss</string>
+    <string name="action_clear_all">Rensa alla</string>
+    <string name="confirm_clear_recents">Rensa hela samtalshistoriken i appen?</string>
+    <string name="action_clear">Rensa</string>
+
+    <!-- Calling -->
+    <string name="toast_no_number">Ange ett nummer först.</string>
+    <string name="toast_no_switchboard">Inget växelnummer är inställt. Ange det under Inställningar.</string>
+    <string name="toast_call_fallback">Kunde inte ringa direkt – öppnar telefonen</string>
+    <string name="toast_call_permission_denied">Behörighet att ringa saknas – öppnar telefonen</string>
+    <string name="toast_no_phone_app">Hittade ingen telefonapp på enheten.</string>
+    <string name="permission_call_title">Behörighet att ringa</string>
+    <string name="permission_call_rationale">Jobbdialer behöver behörighet att ringa samtal för att kunna koppla upp samtalet direkt. Utan behörigheten öppnas telefonens egen app med numret ifyllt, och du trycker på ring där.</string>
+    <string name="continue_action">Fortsätt</string>
+    <string name="open_phone_app">Öppna telefonen</string>
+
+    <!-- Export / import -->
+    <string name="export_file_name" translatable="false">jobbdialer-kontakter-%1$s.json</string>
+    <string name="export_nothing">Det finns inga kontakter att exportera.</string>
+    <string name="export_failed">Exporten misslyckades.</string>
+    <string name="import_failed">Importen misslyckades. Kontrollera att filen är en kontaktexport från Jobbdialer.</string>
+    <string name="no_file_app">Hittade ingen app för att välja fil.</string>
+    <plurals name="export_done">
+        <item quantity="one">%d kontakt exporterades.</item>
+        <item quantity="other">%d kontakter exporterades.</item>
+    </plurals>
+    <plurals name="import_added">
+        <item quantity="one">%d kontakt lades till.</item>
+        <item quantity="other">%d kontakter lades till.</item>
+    </plurals>
+    <plurals name="import_skipped">
+        <item quantity="one">%d hoppades över (fanns redan eller var tom).</item>
+        <item quantity="other">%d hoppades över (fanns redan eller var tomma).</item>
+    </plurals>
+
+    <!-- Settings -->
+    <string name="settings_title">Inställningar</string>
+    <string name="cd_navigate_up">Tillbaka</string>
+    <string name="settings_section_numbers">Nummer</string>
+    <string name="label_prefix_internal">Prefix för internsamtal</string>
+    <string name="help_prefix_internal">Läggs före numret när du trycker på Ring internt, t.ex. 03134 + 30771. Läggs inte till om numret redan börjar med prefixet.</string>
+    <string name="label_prefix_patient">Prefix för patientsamtal</string>
+    <string name="help_prefix_patient">Läggs före numret när du trycker på Ring patient. #31# döljer ditt nummer för mottagaren.</string>
+    <string name="label_switchboard">Växelnummer</string>
+    <string name="help_switchboard">Rings utan prefix med Ring växeln och med genvägen på appikonen.</string>
+    <string name="reset_defaults">Återställ standard</string>
+    <string name="confirm_reset_title">Återställ standard</string>
+    <string name="confirm_reset_message">Återställa prefix och växelnummer till standardvärdena (%1$s, %2$s och %3$s)?</string>
+    <string name="action_reset">Återställ</string>
+    <string name="reset_done">Standardvärdena är återställda.</string>
+    <string name="settings_section_call_log">Samtalslogg</string>
+    <string name="hide_call_log">Dölj appens samtal i telefonens samtalslogg</string>
+    <string name="hide_call_log_help">Android sparar alltid samtal i telefonens samtalslogg. När inställningen är på raderar appen efteråt de samtal som har ringts härifrån. Det sker i bakgrunden när samtalet är avslutat och kan dröja en liten stund. Samtalen kan ändå synas hos operatören, på fakturan, i en annan telefonapp med egen logg eller i en säkerhetskopia som hann skapas.</string>
+    <string name="hide_call_log_dialog_title">Dölj samtal i samtalsloggen</string>
+    <string name="hide_call_log_dialog_message">För att kunna radera appens samtal ur telefonens samtalslogg behöver Jobbdialer behörighet att läsa och ändra samtalsloggen.\n\nAppen raderar bara samtal som har ringts från appen. Inga uppgifter lämnar telefonen.</string>
+    <string name="hide_call_log_denied">Behörigheten nekades – inställningen stängdes av.</string>
+    <string name="hide_call_log_enabled">Appens samtal raderas nu ur samtalsloggen.</string>
+    <string name="permission_denied_title">Behörighet saknas</string>
+    <string name="permission_denied_call_log_message">Behörigheten för samtalsloggen är nekad. Du kan ge den under Appinfo → Behörigheter och sedan slå på inställningen igen.</string>
+    <string name="open_app_info">Appinfo</string>
+    <string name="settings_section_contacts">Kontakter</string>
+    <string name="settings_contacts_help">Kontakterna sparas som en JSON-fil. Vid import läggs nya kontakter till; kontakter med samma jobbnr, eller samma namn och privatnr, hoppas över.</string>
+    <string name="settings_export">Exportera kontakter</string>
+    <string name="settings_import">Importera kontakter</string>
+    <string name="settings_version">Jobbdialer version %1$s</string>
+
+    <!-- Launcher shortcut -->
+    <string name="shortcut_switchboard_short">Ring växeln</string>
+    <string name="shortcut_switchboard_long">Ring växeln</string>
+</resources>

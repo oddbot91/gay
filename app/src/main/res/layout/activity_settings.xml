@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Settings screen: numbers, call log option, contacts export/import, version. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/window_bg"
+    android:orientation="vertical">
+
+    <Toolbar
+        android:id="@+id/toolbar"
+        style="@style/ToolbarStyle"
+        android:navigationContentDescription="@string/cd_navigate_up"
+        android:navigationIcon="@drawable/ic_arrow_back"
+        android:theme="@style/ToolbarTheme"
+        android:title="@string/settings_title" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="@dimen/pane_padding"
+            android:paddingRight="@dimen/pane_padding"
+            android:paddingBottom="@dimen/space_large">
+
+            <!-- Numbers -->
+            <TextView
+                style="@style/SettingsHeader"
+                android:text="@string/settings_section_numbers" />
+
+            <TextView
+                style="@style/SettingsLabel"
+                android:labelFor="@+id/prefix_internal"
+                android:text="@string/label_prefix_internal" />
+
+            <EditText
+                android:id="@+id/prefix_internal"
+                style="@style/DialogField"
+                android:inputType="phone" />
+
+            <TextView
+                style="@style/SettingsHelp"
+                android:text="@string/help_prefix_internal" />
+
+            <TextView
+                style="@style/SettingsLabel"
+                android:labelFor="@+id/prefix_patient"
+                android:text="@string/label_prefix_patient" />
+
+            <EditText
+                android:id="@+id/prefix_patient"
+                style="@style/DialogField"
+                android:inputType="phone" />
+
+            <TextView
+                style="@style/SettingsHelp"
+                android:text="@string/help_prefix_patient" />
+
+            <TextView
+                style="@style/SettingsLabel"
+                android:labelFor="@+id/switchboard_number"
+                android:text="@string/label_switchboard" />
+
+            <EditText
+                android:id="@+id/switchboard_number"
+                style="@style/DialogField"
+                android:imeOptions="actionDone"
+                android:inputType="phone" />
+
+            <TextView
+                style="@style/SettingsHelp"
+                android:text="@string/help_switchboard" />
+
+            <Button
+                android:id="@+id/reset_defaults"
+                style="@style/SettingsButton"
+                android:layout_marginTop="@dimen/space_medium"
+                android:text="@string/reset_defaults" />
+
+            <!-- Call log -->
+            <TextView
+                style="@style/SettingsHeader"
+                android:text="@string/settings_section_call_log" />
+
+            <Switch
+                android:id="@+id/hide_call_log"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/space_small"
+                android:minHeight="@dimen/settings_button_min_height"
+                android:saveEnabled="false"
+                android:text="@string/hide_call_log"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="15sp" />
+
+            <TextView
+                style="@style/SettingsHelp"
+                android:text="@string/hide_call_log_help" />
+
+            <!-- Contacts -->
+            <TextView
+                style="@style/SettingsHeader"
+                android:text="@string/settings_section_contacts" />
+
+            <TextView
+                style="@style/SettingsHelp"
+                android:text="@string/settings_contacts_help" />
+
+            <Button
+                android:id="@+id/export_contacts"
+                style="@style/SettingsButton"
+                android:text="@string/settings_export" />
+
+            <Button
+                android:id="@+id/import_contacts"
+                style="@style/SettingsButton"
+                android:text="@string/settings_import" />
+
+            <TextView
+                android:id="@+id/version"
+                style="@style/SettingsHelp"
+                android:layout_marginTop="@dimen/space_large"
+                android:gravity="center" />
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

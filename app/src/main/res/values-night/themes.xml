@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+        Dark variant of the app theme. Selected whenever the system is in night mode,
+        on every API level (the "night" qualifier takes precedence over "v29"). This keeps
+        the theme consistent with values-night/colors.xml also on API 26-28 devices that
+        support a system-wide night mode.
+    -->
+    <style name="Theme.Jobbdialer" parent="android:Theme.DeviceDefault.NoActionBar">
+        <item name="android:colorPrimary">@color/primary</item>
+        <item name="android:colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:colorAccent">@color/accent</item>
+        <item name="android:statusBarColor">@color/primary_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowBackground">@color/window_bg</item>
+    </style>
+
+    <style name="ToolbarPopup" parent="@android:style/ThemeOverlay.Material.Dark" />
+</resources>

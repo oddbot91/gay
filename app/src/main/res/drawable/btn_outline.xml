@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Outlined button (settings screen): transparent fill, 1dp brand-coloured outline. The mask
+     layer keeps the ripple inside the rounded rectangle. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/ripple_neutral">
+    <item android:id="@android:id/mask">
+        <shape android:shape="rectangle">
+            <solid android:color="#FFFFFFFF" />
+            <corners android:radius="@dimen/button_radius" />
+        </shape>
+    </item>
+    <item>
+        <selector>
+            <item android:state_pressed="true">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/outline_pressed_bg" />
+                    <stroke
+                        android:width="@dimen/outline_width"
+                        android:color="@color/outline" />
+                    <corners android:radius="@dimen/button_radius" />
+                </shape>
+            </item>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@android:color/transparent" />
+                    <stroke
+                        android:width="@dimen/outline_width"
+                        android:color="@color/outline" />
+                    <corners android:radius="@dimen/button_radius" />
+                </shape>
+            </item>
+        </selector>
+    </item>
+</ripple>

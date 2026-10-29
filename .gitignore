@@ -1,0 +1,20 @@
+# Build output
+build/
+.gradle/
+build-manual/
+tools/out/
+*.apk
+
+# Local SDK path / IDE files
+local.properties
+*.iml
+.idea/
+
+# Signing secrets never go into the repo (the repo is public). GitHub Actions gets the key from
+# repository secrets, local builds from these untracked files. See keystore/README.md.
+signing.properties
+keystore/*.jks
+keystore/*.p12
+keystore/*.keystore
+keystore/*.b64
+keystore/*.txt

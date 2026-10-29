@@ -1,0 +1,170 @@
+name: Build APK
+
+# Builds a signed release APK on every push to main/master, on manual dispatch and on
+# version tags (v*). Tags additionally publish a GitHub Release with the APK attached.
+#
+# Signing (see keystore/README.md). The keystore and its password are NOT committed; they come
+# from repository secrets:
+#   * KEYSTORE_B64      = base64 of the .jks/.p12 keystore file        (required for a real key)
+#   * KEYSTORE_PASSWORD = keystore password                             (required for a real key)
+#   * KEY_ALIAS         = key alias, default "jobbdialer"               (optional)
+#   * KEY_PASSWORD      = key password, default = KEYSTORE_PASSWORD     (optional)
+# Without KEYSTORE_B64 a fresh clone still builds: a temporary keystore is generated so the
+# pipeline can be verified, but such an APK is signed with a throwaway key (every build gets a
+# new key, so a later build cannot be installed over it without uninstalling first).
+# A local build reads signing.properties instead (storeFile/storePassword/keyAlias/keyPassword).
+
+on:
+  push:
+    branches: [main, master]
+    tags: ['v*']
+  workflow_dispatch:
+
+permissions:
+  contents: write # needed by softprops/action-gh-release to create the Release on tags
+
+env:
+  BUILD_TOOLS_VERSION: '35.0.0'
+  COMPILE_SDK: '35'
+
+jobs:
+  build:
+    name: Assemble signed release APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+          cache: gradle
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+        with:
+          packages: 'platforms;android-35 build-tools;35.0.0 platform-tools'
+
+      - name: Static checks (tools/check.sh)
+        # Informational: shows XML/resource/javac problems early, never blocks the APK build.
+        continue-on-error: true
+        run: |
+          sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          export ANDROID_JAR="$sdk/platforms/android-$COMPILE_SDK/android.jar"
+          bash tools/check.sh
+
+      - name: Resolve signing configuration
+        env:
+          SECRET_KEYSTORE_B64: ${{ secrets.KEYSTORE_B64 }}
+          SECRET_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          SECRET_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          SECRET_KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          set -euo pipefail
+
+          # Read one key from signing.properties (empty string if the file or key is absent).
+          prop() { [ -f signing.properties ] && sed -n "s/^$1=//p" signing.properties | head -n1 | tr -d '\r' || true; }
+
+          # Prefer the secret, fall back to signing.properties.
+          pick() { if [ -n "$1" ]; then printf '%s' "$1"; else printf '%s' "$2"; fi; }
+
+          mkdir -p "$RUNNER_TEMP/signing"
+          temporary_key=no
+          if [ -n "$SECRET_KEYSTORE_B64" ]; then
+            printf '%s' "$SECRET_KEYSTORE_B64" | tr -d ' \n\r' | base64 -d > "$RUNNER_TEMP/signing/release.jks"
+            keystore_file="$RUNNER_TEMP/signing/release.jks"
+            keystore_password="$(pick "$SECRET_KEYSTORE_PASSWORD" "$(prop storePassword)")"
+            key_alias="$(pick "$SECRET_KEY_ALIAS" "$(prop keyAlias)")"
+            key_password="$(pick "$SECRET_KEY_PASSWORD" "$(prop keyPassword)")"
+            echo "Using keystore from secret KEYSTORE_B64"
+          elif [ -f signing.properties ]; then
+            store_file="$(prop storeFile)"
+            case "$store_file" in
+              /*) keystore_file="$store_file" ;;
+              *)  keystore_file="$GITHUB_WORKSPACE/${store_file:-keystore/jobbdialer.jks}" ;;
+            esac
+            keystore_password="$(pick "$SECRET_KEYSTORE_PASSWORD" "$(prop storePassword)")"
+            key_alias="$(pick "$SECRET_KEY_ALIAS" "$(prop keyAlias)")"
+            key_password="$(pick "$SECRET_KEY_PASSWORD" "$(prop keyPassword)")"
+            echo "Using keystore from signing.properties: $keystore_file"
+          else
+            # No real key available: generate a throwaway one so the pipeline still produces an
+            # installable APK. Add the KEYSTORE_B64 + KEYSTORE_PASSWORD secrets for a stable key.
+            temporary_key=yes
+            keystore_file="$RUNNER_TEMP/signing/temporary.jks"
+            keystore_password="$(head -c 24 /dev/urandom | base64 | tr -dc 'A-Za-z0-9' | head -c 20)"
+            key_alias="jobbdialer"
+            key_password="$keystore_password"
+            keytool -genkeypair -keystore "$keystore_file" -storetype PKCS12 -alias "$key_alias" \
+              -keyalg RSA -keysize 2048 -validity 10950 -storepass "$keystore_password" \
+              -keypass "$key_password" -dname "CN=Jobbdialer temporary key, O=Jobbdialer, C=SE"
+            echo "::warning title=Temporary signing key::No KEYSTORE_B64 secret is set. The APK is signed with a throwaway key generated for this run only; a future build cannot be installed over it without uninstalling first. Add the repository secrets KEYSTORE_B64 and KEYSTORE_PASSWORD (see keystore/README.md)."
+          fi
+          [ -f "$keystore_file" ] || { echo "::error::Keystore not found: $keystore_file"; exit 1; }
+          key_alias="${key_alias:-jobbdialer}"
+          key_password="${key_password:-$keystore_password}"
+          [ -n "$keystore_password" ] || {
+            echo "::error::Missing keystore password (secret KEYSTORE_PASSWORD or storePassword in signing.properties)"
+            exit 1
+          }
+          {
+            echo "## Signing"
+            if [ "$temporary_key" = yes ]; then
+              echo ":warning: **Temporary key** – this APK is signed with a throwaway key generated for this run. Add the secrets \`KEYSTORE_B64\` and \`KEYSTORE_PASSWORD\` for a stable key (see keystore/README.md)."
+            else
+              echo ":white_check_mark: Signed with the configured release key (alias \`$key_alias\`)."
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+          echo "::add-mask::$keystore_password"
+          echo "::add-mask::$key_password"
+          {
+            echo "KEYSTORE_FILE=$keystore_file"
+            echo "KEYSTORE_PASSWORD=$keystore_password"
+            echo "KEY_ALIAS=$key_alias"
+            echo "KEY_PASSWORD=$key_password"
+          } >> "$GITHUB_ENV"
+
+      - name: Make Gradle wrapper executable
+        run: chmod +x gradlew
+
+      - name: Build release APK
+        run: ./gradlew --no-daemon --stacktrace assembleRelease
+
+      - name: Verify APK signature
+        run: |
+          set -euo pipefail
+          sdk="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          apksigner="$sdk/build-tools/$BUILD_TOOLS_VERSION/apksigner"
+          [ -x "$apksigner" ] || { echo "::error::apksigner not found at $apksigner"; exit 1; }
+
+          shopt -s nullglob
+          apks=(app/build/outputs/apk/release/*.apk)
+          if [ "${#apks[@]}" -eq 0 ]; then
+            echo "::error::No APK found in app/build/outputs/apk/release/"
+            ls -R app/build/outputs || true
+            exit 1
+          fi
+          for apk in "${apks[@]}"; do
+            echo "--- $apk ($(du -h "$apk" | cut -f1))"
+            "$apksigner" verify --verbose --print-certs "$apk"
+          done
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jobbdialer-apk
+          path: app/build/outputs/apk/release/*.apk
+          if-no-files-found: error
+
+      - name: Create GitHub Release (tags v*)
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: app/build/outputs/apk/release/*.apk
+          fail_on_unmatched_files: true
+          generate_release_notes: true

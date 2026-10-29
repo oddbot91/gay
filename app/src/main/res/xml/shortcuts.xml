@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Static launcher shortcut (long-press on the app icon): "Ring växeln". -->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+    <shortcut
+        android:enabled="true"
+        android:icon="@mipmap/ic_shortcut_switchboard"
+        android:shortcutId="call_switchboard"
+        android:shortcutLongLabel="@string/shortcut_switchboard_long"
+        android:shortcutShortLabel="@string/shortcut_switchboard_short">
+        <intent
+            android:action="se.jobbdialer.action.CALL_SWITCHBOARD"
+            android:targetClass="se.jobbdialer.MainActivity"
+            android:targetPackage="se.jobbdialer" />
+    </shortcut>
+</shortcuts>

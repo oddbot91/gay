@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Brand colours (SPEC section 2). Identical in light and dark mode. -->
+    <color name="primary">#FF1565C0</color>
+    <color name="primary_dark">#FF0D47A1</color>
+    <color name="accent">#FFFF8F00</color>
+    <color name="patient">#FF6A1B9A</color>
+    <color name="switchboard">#FF2E7D32</color>
+
+    <!-- Pressed variants of the coloured buttons. -->
+    <color name="primary_pressed">#FF0D47A1</color>
+    <color name="patient_pressed">#FF4A148C</color>
+    <color name="switchboard_pressed">#FF1B5E20</color>
+
+    <!-- Text/icons drawn on top of the brand colours. -->
+    <color name="on_color">#FFFFFFFF</color>
+    <color name="on_color_secondary">#D9FFFFFF</color>
+    <color name="ripple_on_color">#40FFFFFF</color>
+
+    <!-- Surfaces (overridden in values-night). -->
+    <color name="window_bg">#FFFAFAFA</color>
+    <color name="surface_bar">#FFFFFFFF</color>
+    <color name="divider">#1F000000</color>
+    <color name="keypad_bg">#FFECEFF3</color>
+    <color name="keypad_pressed">#FFD3DAE2</color>
+    <color name="ripple_neutral">#24000000</color>
+    <color name="btn_disabled">#FF9E9E9E</color>
+    <color name="outline">#FF1565C0</color>
+    <color name="outline_pressed_bg">#1F1565C0</color>
+
+    <!-- Text/icon accents that must stay readable on the surface colour. -->
+    <color name="brand_text">#FF1565C0</color>
+    <color name="tab_selected">#FF1565C0</color>
+    <color name="tab_unselected">#FF6B6B6B</color>
+
+    <!-- Call mode colours (recents icons, contact row icons). -->
+    <color name="mode_internal">#FF1565C0</color>
+    <color name="mode_patient">#FF6A1B9A</color>
+    <color name="mode_switchboard">#FF2E7D32</color>
+    <color name="mode_private">#FFE65100</color>
+</resources>

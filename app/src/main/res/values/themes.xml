@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+        App theme. API 26-28 in normal (day) mode: light DeviceDefault theme.
+        values-night/themes.xml provides the dark variant (API 26-28 night mode, and every
+        API level in night mode); values-v29/themes.xml switches to DayNight on API 29+.
+    -->
+    <style name="Theme.Jobbdialer" parent="android:Theme.DeviceDefault.Light.NoActionBar">
+        <item name="android:colorPrimary">@color/primary</item>
+        <item name="android:colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:colorAccent">@color/accent</item>
+        <item name="android:statusBarColor">@color/primary_dark</item>
+        <!-- White status bar icons on the dark blue status bar, in both light and dark mode. -->
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowBackground">@color/window_bg</item>
+    </style>
+
+    <!-- Overflow menu popup of the blue toolbar (light here, dark in values-night). -->
+    <style name="ToolbarPopup" parent="@android:style/ThemeOverlay.Material.Light" />
+
+    <!-- Theme overlay for the blue toolbar: white overflow/navigation icons. -->
+    <style name="ToolbarTheme" parent="@android:style/ThemeOverlay.Material.Dark.ActionBar" />
+
+    <!-- ===================================================================== widgets -->
+
+    <style name="ToolbarStyle">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">?android:attr/actionBarSize</item>
+        <item name="android:background">@color/primary</item>
+        <item name="android:elevation">@dimen/toolbar_elevation</item>
+        <item name="android:titleTextColor">@color/on_color</item>
+        <item name="android:popupTheme">@style/ToolbarPopup</item>
+    </style>
+
+    <style name="TabButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:paddingTop">6dp</item>
+        <item name="android:paddingBottom">4dp</item>
+        <item name="android:drawablePadding">2dp</item>
+        <item name="android:textSize">@dimen/tab_text_size</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:textColor">@color/tab_text_color</item>
+        <item name="android:drawableTint">@color/tab_text_color</item>
+    </style>
+
+    <style name="KeypadRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/key_height</item>
+        <item name="android:orientation">horizontal</item>
+    </style>
+
+    <style name="KeypadKey">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_margin">@dimen/key_gap</item>
+        <item name="android:background">@drawable/btn_keypad</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:padding">0dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:textSize">@dimen/key_text_size</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:fontFamily">sans-serif</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:elevation">0dp</item>
+    </style>
+
+    <style name="CallButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:minHeight">@dimen/call_button_min_height</item>
+        <item name="android:orientation">vertical</item>
+        <item name="android:gravity">center</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:paddingLeft">@dimen/space_tiny</item>
+        <item name="android:paddingRight">@dimen/space_tiny</item>
+        <item name="android:paddingTop">@dimen/space_small</item>
+        <item name="android:paddingBottom">@dimen/space_small</item>
+    </style>
+
+    <style name="CallButtonTitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/on_color</item>
+        <item name="android:textSize">@dimen/call_title_text_size</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:drawableStart">@drawable/ic_phone_small</item>
+        <item name="android:drawableTint">@color/on_color</item>
+        <item name="android:drawablePadding">6dp</item>
+    </style>
+
+    <style name="CallButtonSubtitle">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:gravity">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/on_color_secondary</item>
+        <item name="android:textSize">@dimen/call_subtitle_text_size</item>
+    </style>
+
+    <style name="MatchRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">@dimen/match_row_height</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:paddingLeft">@dimen/space_small</item>
+        <item name="android:paddingRight">@dimen/space_small</item>
+        <item name="android:drawableStart">@drawable/ic_contact</item>
+        <item name="android:drawableTint">@color/brand_text</item>
+        <item name="android:drawablePadding">@dimen/space_medium</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textSize">@dimen/contact_number_text_size</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="ContactSubRow">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:minHeight">@dimen/row_sub_min_height</item>
+        <item name="android:orientation">horizontal</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:background">?android:attr/selectableItemBackground</item>
+        <item name="android:clickable">true</item>
+        <item name="android:focusable">true</item>
+        <item name="android:paddingLeft">@dimen/space_tiny</item>
+        <item name="android:paddingRight">@dimen/space_tiny</item>
+    </style>
+
+    <style name="ContactSubRowIcon">
+        <item name="android:layout_width">@dimen/row_icon_size</item>
+        <item name="android:layout_height">@dimen/row_icon_size</item>
+        <item name="android:layout_marginEnd">@dimen/space_medium</item>
+        <item name="android:importantForAccessibility">no</item>
+        <item name="android:src">@drawable/ic_phone</item>
+    </style>
+
+    <style name="ContactSubRowText">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textSize">@dimen/contact_number_text_size</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+
+    <style name="EmptyText">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:gravity">center</item>
+        <item name="android:padding">@dimen/space_large</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+        <item name="android:visibility">gone</item>
+    </style>
+
+    <style name="SettingsHeader">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/space_large</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/brand_text</item>
+    </style>
+
+    <style name="SettingsLabel">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/space_medium</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textColor">?android:attr/textColorPrimary</item>
+    </style>
+
+    <style name="SettingsHelp">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/space_tiny</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="SettingsButton">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/space_small</item>
+        <item name="android:minHeight">@dimen/settings_button_min_height</item>
+        <item name="android:background">@drawable/btn_outline</item>
+        <item name="android:textColor">@color/brand_text</item>
+        <item name="android:textSize">15sp</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="android:stateListAnimator">@null</item>
+        <item name="android:elevation">0dp</item>
+    </style>
+
+    <style name="DialogLabel">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_marginTop">@dimen/space_small</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textColor">?android:attr/textColorSecondary</item>
+    </style>
+
+    <style name="DialogField">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:importantForAutofill">no</item>
+        <item name="android:imeOptions">actionNext</item>
+    </style>
+</resources>

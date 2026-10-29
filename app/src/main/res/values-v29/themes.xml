@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+        API 29+: follow the system dark theme setting.
+        Note: the framework has no public "Theme.DeviceDefault.DayNight.NoActionBar" style
+        (only Theme.DeviceDefault.DayNight, added in API 29), so the action bar is removed
+        with windowActionBar/windowNoTitle instead.
+    -->
+    <style name="Theme.Jobbdialer" parent="android:Theme.DeviceDefault.DayNight">
+        <item name="android:windowActionBar">false</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:colorPrimary">@color/primary</item>
+        <item name="android:colorPrimaryDark">@color/primary_dark</item>
+        <item name="android:colorAccent">@color/accent</item>
+        <item name="android:statusBarColor">@color/primary_dark</item>
+        <item name="android:windowLightStatusBar">false</item>
+        <item name="android:windowBackground">@color/window_bg</item>
+    </style>
+</resources>

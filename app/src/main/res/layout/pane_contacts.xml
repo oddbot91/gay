@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- "Kontakter" pane: search field + sort button, the list, empty text and the round add button. -->
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/space_medium"
+        android:paddingTop="@dimen/space_tiny"
+        android:paddingRight="@dimen/space_tiny">
+
+        <EditText
+            android:id="@+id/search_field"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:drawableStart="@drawable/ic_search"
+            android:drawablePadding="@dimen/space_small"
+            android:drawableTint="?android:attr/textColorSecondary"
+            android:hint="@string/search_hint"
+            android:imeOptions="actionSearch"
+            android:importantForAutofill="no"
+            android:inputType="text"
+            android:maxLines="1" />
+
+        <TextView
+            android:id="@+id/sort_button"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/icon_button_size"
+            android:background="?android:attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center"
+            android:maxLines="1"
+            android:paddingLeft="@dimen/space_small"
+            android:paddingRight="@dimen/space_small"
+            android:textColor="@color/brand_text"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ListView
+            android:id="@+id/contacts_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:clipToPadding="false"
+            android:divider="@color/divider"
+            android:dividerHeight="1dp"
+            android:paddingBottom="@dimen/list_bottom_padding" />
+
+        <TextView
+            android:id="@+id/contacts_empty"
+            style="@style/EmptyText" />
+
+        <ImageButton
+            android:id="@+id/fab_add"
+            android:layout_width="@dimen/fab_size"
+            android:layout_height="@dimen/fab_size"
+            android:layout_gravity="bottom|end"
+            android:layout_margin="@dimen/fab_margin"
+            android:background="@drawable/fab_bg"
+            android:contentDescription="@string/cd_add_contact"
+            android:elevation="@dimen/fab_elevation"
+            android:scaleType="center"
+            android:src="@drawable/ic_add"
+            android:tint="@color/on_color" />
+    </FrameLayout>
+</LinearLayout>
