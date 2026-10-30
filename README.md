@@ -64,20 +64,35 @@ rullar som vanligt uppåt och nedåt; bara tydligt vågräta svep byter flik.
   (ett mobilnummer rings som det är även i läget Internt).
 - Håll in en kontakt för menyn: **Ring jobbnr direkt**, **Ring privat direkt**, **Ring privat
   med dolt nummer (#31#)**, **Skicka SMS** (till privatnumret), **Redigera**, **Lägg till i
-  favoriter** / **Ta bort från favoriter**, **Välj flera…** och **Ta bort**. Menyposter för
+  favoriter** / **Ta bort från favoriter**, **Välj flera…**, **Dölj kontakt** / **Visa kontakt**
+  och **Ta bort**. Menyposter för
   nummer som saknas visas inte.
 - Du kan söka på namn och nummer. Listan kan sorteras på efternamn, förnamn, jobbnr eller
   privatnr, och appen kommer ihåg valet.
 - Kontakterna kan ordnas i **kategorier** och **favoriter** (se nedan).
-- **Markera flera och ta bort på en gång:** välj **Välj flera…** i kontaktens meny eller
+- **Markera flera och dölj eller ta bort på en gång:** välj **Välj flera…** i kontaktens meny eller
   **Välj kontakter** i menyn (⋮). Varje kontakt får en kryssruta; tryck på en kontakt för att
   markera eller avmarkera den. Tryck på en grupprubrik för att markera (eller avmarkera) alla
   kontakter i gruppen – gruppen fälls ut. Rubriken Favoriter markerar alla favoriter.
-  Längst ner visas i stället för sökfältet `N valda`, **Markera alla** (alla kontakter, eller
-  sökträffarna om du har sökt), **Ta bort** och **Avbryt**. **Ta bort** frågar först
-  ”Ta bort N kontakter?”. Bakåtknappen avslutar markeringsläget.
+  Längst ner visas i stället för sökfältet `N valda`, **Åtgärder ▾** och **Avbryt**.
+  **Åtgärder** öppnar en meny med **Markera alla** (kontakterna som visas i listan, eller
+  sökträffarna om du har sökt), **Dölj valda**, **Visa valda** och **Ta bort valda**.
+  **Ta bort valda** frågar först ”Ta bort N kontakter?”. Bakåtknappen avslutar markeringsläget.
 - Sökfältet, sorteringen och knappen **+** (ny kontakt) ligger längst ner, nära tummen, och
   listan fylls nerifrån, så att gruppen Favoriter hamnar precis ovanför sökfältet.
+
+### Dolda kontakter
+
+En kontakt som du sällan behöver kan **döljas** i stället för att tas bort: håll in kontakten och
+välj **Dölj kontakt**, kryssa i **Dold – visas bara vid sökning** i redigeringsdialogen, eller
+markera flera kontakter och välj **Åtgärder ▾ → Dölj valda**. En dold kontakt visas inte i
+kategorigrupperna, i Övriga eller i Favoriter (även om den är favorit), räknas inte i rubrikernas
+antal och föreslås aldrig i knappsatsen (varken som sökträff eller bland favoriterna). Den hittas
+däremot när du söker i fliken Kontakter, och då visas ett litet överstruket öga efter namnet.
+Med **Visa dolda kontakter** i menyn (⋮) visas även de dolda kontakterna i listan (med ögat), så
+att du kan markera dem och välja **Visa valda** eller hålla in en och välja **Visa kontakt**.
+Valet sparas inte – det är avslaget varje gång appen startar. Samtalshistoriken visar fortfarande
+namnet på en dold kontakt. Dolda kontakter följer med vid export och import.
 
 ### Sök kontakter från knappsatsen (T9)
 

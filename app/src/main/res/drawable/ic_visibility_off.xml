@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Crossed-out eye ("hidden contact"): eye outline, pupil and a diagonal slash. Black; tinted
+     where used (row_contact.xml: ?android:attr/textColorSecondary). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Eye outline -->
+    <path
+        android:pathData="M2,12C4.8,7.2 8.2,5.5 12,5.5C15.8,5.5 19.2,7.2 22,12C19.2,16.8 15.8,18.5 12,18.5C8.2,18.5 4.8,16.8 2,12Z"
+        android:strokeWidth="2"
+        android:strokeColor="#FF000000"
+        android:strokeLineJoin="round" />
+    <!-- Pupil -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M12,9A3,3 0,1 1,12 15A3,3 0,1 1,12 9Z" />
+    <!-- Slash -->
+    <path
+        android:pathData="M4,3L20,21"
+        android:strokeWidth="2.2"
+        android:strokeColor="#FF000000"
+        android:strokeLineCap="round" />
+</vector>

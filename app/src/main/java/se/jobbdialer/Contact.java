@@ -15,6 +15,7 @@ final class Contact {
     private static final String J_PRIVATE = "privateNumber";
     private static final String J_CATEGORY = "category";
     private static final String J_FAVORITE = "favorite";
+    private static final String J_HIDDEN = "hidden";
 
     final String id;
     String firstName;
@@ -24,6 +25,8 @@ final class Contact {
     /** Category name; "" = none (shown under "Övriga"). Never null. */
     String category;
     boolean favorite;
+    /** Hidden contacts are only listed by a search (or with "Visa dolda kontakter" on). */
+    boolean hidden;
 
     Contact(String id, String firstName, String lastName, String workNumber, String privateNumber) {
         this(id, firstName, lastName, workNumber, privateNumber, "", false);
@@ -31,6 +34,11 @@ final class Contact {
 
     Contact(String id, String firstName, String lastName, String workNumber, String privateNumber,
             String category, boolean favorite) {
+        this(id, firstName, lastName, workNumber, privateNumber, category, favorite, false);
+    }
+
+    Contact(String id, String firstName, String lastName, String workNumber, String privateNumber,
+            String category, boolean favorite, boolean hidden) {
         this.id = isBlank(id) ? newId() : id.trim();
         this.firstName = trim(firstName);
         this.lastName = trim(lastName);
@@ -38,6 +46,7 @@ final class Contact {
         this.privateNumber = trim(privateNumber);
         this.category = trim(category);
         this.favorite = favorite;
+        this.hidden = hidden;
     }
 
     static Contact create(String firstName, String lastName, String workNumber, String privateNumber) {
@@ -72,17 +81,22 @@ final class Contact {
 
     /** Copy with a fresh id (used when an imported id collides with an existing one). */
     Contact withNewId() {
-        return new Contact(newId(), firstName, lastName, workNumber, privateNumber, category, favorite);
+        return new Contact(newId(), firstName, lastName, workNumber, privateNumber, category, favorite, hidden);
     }
 
     /** Copy with another category. */
     Contact withCategory(String newCategory) {
-        return new Contact(id, firstName, lastName, workNumber, privateNumber, newCategory, favorite);
+        return new Contact(id, firstName, lastName, workNumber, privateNumber, newCategory, favorite, hidden);
     }
 
     /** Copy with another favorite flag. */
     Contact withFavorite(boolean newFavorite) {
-        return new Contact(id, firstName, lastName, workNumber, privateNumber, category, newFavorite);
+        return new Contact(id, firstName, lastName, workNumber, privateNumber, category, newFavorite, hidden);
+    }
+
+    /** Copy with another hidden flag. */
+    Contact withHidden(boolean newHidden) {
+        return new Contact(id, firstName, lastName, workNumber, privateNumber, category, favorite, newHidden);
     }
 
     JSONObject toJson() throws JSONException {
@@ -94,10 +108,14 @@ final class Contact {
         o.put(J_PRIVATE, privateNumber);
         o.put(J_CATEGORY, category);
         o.put(J_FAVORITE, favorite);
+        o.put(J_HIDDEN, hidden);
         return o;
     }
 
-    /** Lenient parser; missing fields become empty strings, a missing id gets a new UUID. */
+    /**
+     * Lenient parser; missing fields become empty strings (flags false), a missing id gets a new
+     * UUID.
+     */
     static Contact fromJson(JSONObject o) {
         if (o == null) {
             return null;
@@ -109,7 +127,8 @@ final class Contact {
                 o.optString(J_WORK, ""),
                 o.optString(J_PRIVATE, ""),
                 o.optString(J_CATEGORY, ""),
-                o.optBoolean(J_FAVORITE, false));
+                o.optBoolean(J_FAVORITE, false),
+                o.optBoolean(J_HIDDEN, false));
     }
 
     private static String trim(String s) {

@@ -58,6 +58,18 @@
                 android:src="@drawable/ic_star"
                 android:tint="@color/accent"
                 android:visibility="gone" />
+
+            <!-- Crossed-out eye after the name: the contact is hidden (shown only by a search or
+                 with "Visa dolda kontakter" on). GONE otherwise. -->
+            <ImageView
+                android:id="@+id/hidden_icon"
+                android:layout_width="@dimen/hidden_icon_size"
+                android:layout_height="@dimen/hidden_icon_size"
+                android:layout_marginStart="@dimen/space_small"
+                android:contentDescription="@string/cd_hidden"
+                android:src="@drawable/ic_visibility_off"
+                android:tint="?android:attr/textColorSecondary"
+                android:visibility="gone" />
         </LinearLayout>
 
         <!-- [Jobb …] [Privat …] -->

@@ -87,6 +87,14 @@ public class MainActivity extends Activity {
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
+                if (item.getItemId() == R.id.action_show_hidden) {
+                    // Checkable toggle (not persisted): list the hidden contacts too.
+                    boolean checked = !item.isChecked();
+                    item.setChecked(checked);
+                    contactsPane.setShowHidden(checked);
+                    showTab(TAB_CONTACTS);
+                    return true;
+                }
                 return onMenuItem(item.getItemId());
             }
         });

@@ -10,6 +10,11 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.EditorInfo;
 import android.graphics.drawable.Drawable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.style.ForegroundColorSpan;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
@@ -21,12 +26,15 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -39,8 +47,13 @@ import java.util.Set;
  *
  * <p>Selection mode (long-press "Välj flera…" or the toolbar menu "Välj kontakter"): check boxes
  * on the rows, tap = toggle, tap on a group header = toggle the whole group, and the bottom bar is
- * replaced by a selection bar (count, "Markera alla", "Ta bort", "Avbryt"). The selection is a set
- * of contact ids kept in memory only.
+ * replaced by a selection bar (count, "Åtgärder ▾", "Avbryt"); "Åtgärder" opens a popup menu with
+ * "Markera alla", "Dölj valda", "Visa valda" and "Ta bort valda". The selection is a set of contact
+ * ids kept in memory only.
+ *
+ * <p>Hidden contacts ({@link Contact#hidden}) are left out of the grouped list, the group counts
+ * and "Markera alla" unless {@link #setShowHidden} is on; a search always finds them. Wherever a
+ * hidden contact is shown, a crossed-out eye follows its name.
  */
 final class ContactsPane {
 
@@ -57,10 +70,18 @@ final class ContactsPane {
     private final View contactsBar;
     private final View selectionBar;
     private final TextView selectionCount;
-    private final View deleteSelectedButton;
+    private final View actionsButton;
     /** Selection mode state: ids of the selected contacts (in memory only). */
     private final Set<String> selected = new LinkedHashSet<>();
     private boolean selecting;
+    /** Toolbar toggle "Visa dolda kontakter" (in memory only, off at start). */
+    private boolean showHidden;
+
+    /** Item ids / order of the selection bar's "Åtgärder" popup menu. */
+    private static final int ACTION_SELECT_ALL = 1;
+    private static final int ACTION_HIDE_SELECTED = 2;
+    private static final int ACTION_UNHIDE_SELECTED = 3;
+    private static final int ACTION_DELETE_SELECTED = 4;
 
     ContactsPane(MainActivity activity, View root) {
         this.activity = activity;
@@ -70,7 +91,7 @@ final class ContactsPane {
         contactsBar = root.findViewById(R.id.contacts_bar);
         selectionBar = root.findViewById(R.id.selection_bar);
         selectionCount = root.findViewById(R.id.selection_count);
-        deleteSelectedButton = root.findViewById(R.id.delete_selected);
+        actionsButton = root.findViewById(R.id.selection_actions);
         ListView list = root.findViewById(R.id.contacts_list);
         list.setAdapter(adapter);
         list.setEmptyView(emptyText);
@@ -112,16 +133,10 @@ final class ContactsPane {
                 showEditDialog(null);
             }
         });
-        root.findViewById(R.id.select_all).setOnClickListener(new View.OnClickListener() {
+        actionsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                selectAllVisible();
-            }
-        });
-        deleteSelectedButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                confirmDeleteSelected();
+                showSelectionActions(v);
             }
         });
         root.findViewById(R.id.cancel_selection).setOnClickListener(new View.OnClickListener() {
@@ -158,6 +173,36 @@ final class ContactsPane {
     private String currentQuery() {
         Editable q = searchField.getText();
         return q == null ? "" : q.toString();
+    }
+
+    /** Toolbar toggle "Visa dolda kontakter": also list the hidden contacts (dialer unaffected). */
+    void setShowHidden(boolean show) {
+        if (showHidden == show) {
+            return;
+        }
+        showHidden = show;
+        if (!show && !selected.isEmpty()) {
+            // Hidden contacts disappear from the list: do not keep them selected out of sight.
+            ContactStore store = ContactStore.get(activity);
+            for (Iterator<String> it = selected.iterator(); it.hasNext(); ) {
+                Contact c = store.findById(it.next());
+                if (c != null && c.hidden) {
+                    it.remove();
+                }
+            }
+        }
+        refresh();
+    }
+
+    /**
+     * The contacts the list currently shows: the search hits (hidden ones included) while a
+     * search is active, otherwise every contact, without the hidden ones unless showHidden.
+     */
+    private List<Contact> shownContacts(ContactStore store, String query, ContactStore.SortMode sort) {
+        if (!query.trim().isEmpty()) {
+            return store.search(query, sort);
+        }
+        return showHidden ? store.getAll(sort) : store.getVisible(sort);
     }
 
     // ============================================================================ selection mode
@@ -200,12 +245,14 @@ final class ContactsPane {
         adapter.notifyDataSetChanged();
     }
 
-    /** "Markera alla": every contact, or the search hits while a search is active. */
+    /**
+     * "Markera alla": the contacts the list currently shows (the search hits while a search is
+     * active; hidden contacts only when they are shown).
+     */
     private void selectAllVisible() {
         ContactStore store = ContactStore.get(activity);
         ContactStore.SortMode sort = activity.getPrefs().getContactSort();
-        String query = currentQuery();
-        List<Contact> visible = query.trim().isEmpty() ? store.getAll(sort) : store.search(query, sort);
+        List<Contact> visible = shownContacts(store, currentQuery(), sort);
         for (Contact c : visible) {
             selected.add(c.id);
         }
@@ -213,14 +260,77 @@ final class ContactsPane {
         adapter.notifyDataSetChanged();
     }
 
-    /** Shows the normal bottom bar or the selection bar, with the count and delete state. */
+    /** Shows the normal bottom bar or the selection bar, with the count. */
     private void updateSelectionUi() {
         contactsBar.setVisibility(selecting ? View.GONE : View.VISIBLE);
         selectionBar.setVisibility(selecting ? View.VISIBLE : View.GONE);
         int n = selected.size();
         selectionCount.setText(activity.getResources().getQuantityString(R.plurals.selection_count, n, n));
-        deleteSelectedButton.setEnabled(n > 0);
-        deleteSelectedButton.setAlpha(n > 0 ? 1f : 0.4f);
+    }
+
+    /** "Åtgärder ▾": Markera alla / Dölj valda / Visa valda / Ta bort valda (red). */
+    private void showSelectionActions(View anchor) {
+        if (!canShowDialog()) {
+            return;
+        }
+        boolean any = !selected.isEmpty();
+        PopupMenu popup = new PopupMenu(activity, anchor);
+        Menu menu = popup.getMenu();
+        menu.add(Menu.NONE, ACTION_SELECT_ALL, ACTION_SELECT_ALL, R.string.selection_select_all);
+        menu.add(Menu.NONE, ACTION_HIDE_SELECTED, ACTION_HIDE_SELECTED, R.string.hide_selected)
+                .setEnabled(any);
+        menu.add(Menu.NONE, ACTION_UNHIDE_SELECTED, ACTION_UNHIDE_SELECTED, R.string.unhide_selected)
+                .setEnabled(any);
+        SpannableString deleteTitle = new SpannableString(activity.getString(R.string.delete_selected));
+        if (any) {
+            // Disabled items keep the theme's disabled colour; only the active item is red.
+            deleteTitle.setSpan(new ForegroundColorSpan(activity.getColor(R.color.destructive)),
+                    0, deleteTitle.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        }
+        menu.add(Menu.NONE, ACTION_DELETE_SELECTED, ACTION_DELETE_SELECTED, deleteTitle).setEnabled(any);
+        popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()) {
+                    case ACTION_SELECT_ALL:
+                        selectAllVisible();
+                        return true;
+                    case ACTION_HIDE_SELECTED:
+                        setSelectedHidden(true);
+                        return true;
+                    case ACTION_UNHIDE_SELECTED:
+                        setSelectedHidden(false);
+                        return true;
+                    case ACTION_DELETE_SELECTED:
+                        confirmDeleteSelected();
+                        return true;
+                    default:
+                        return false;
+                }
+            }
+        });
+        popup.show();
+    }
+
+    /** "Dölj valda" / "Visa valda": one save, a toast, then selection mode ends. */
+    private void setSelectedHidden(boolean hide) {
+        if (selected.isEmpty()) {
+            return;
+        }
+        int changed = ContactStore.get(activity).setHidden(new ArrayList<>(selected), hide);
+        toastHiddenResult(changed, hide);
+        exitSelection();
+        activity.refreshPanes();
+    }
+
+    private void toastHiddenResult(int changed, boolean hide) {
+        if (changed < 0) {
+            Toast.makeText(activity, R.string.save_failed, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        int res = hide ? R.plurals.contacts_hidden : R.plurals.contacts_unhidden;
+        Toast.makeText(activity, activity.getResources().getQuantityString(res, changed, changed),
+                Toast.LENGTH_SHORT).show();
     }
 
     private void confirmDeleteSelected() {
@@ -250,11 +360,15 @@ final class ContactsPane {
                 .show();
     }
 
-    /** Flat rows while searching, otherwise category groups + "Övriga" + "Favoriter". */
+    /**
+     * Flat rows while searching (hidden contacts included), otherwise category groups + "Övriga"
+     * + "Favoriter" built from {@link #shownContacts}, so the group counts match what is listed.
+     */
     private List<Row> buildRows(ContactStore store, String query, ContactStore.SortMode sort) {
         List<Row> rows = new ArrayList<>();
+        List<Contact> all = shownContacts(store, query, sort);
         if (!query.trim().isEmpty()) {
-            for (Contact c : store.search(query, sort)) {
+            for (Contact c : all) {
                 rows.add(Row.contact(c));
             }
             return rows;
@@ -262,7 +376,6 @@ final class ContactsPane {
         if (store.isEmpty()) {
             return rows;
         }
-        List<Contact> all = store.getAll(sort);
         List<String> categories = store.getCategories();
         for (String category : categories) {
             addGroup(rows, category, category, matching(all, category));
@@ -271,7 +384,14 @@ final class ContactsPane {
         if (!others.isEmpty()) {
             addGroup(rows, KEY_OTHER, activity.getString(R.string.group_other), others);
         }
-        List<Contact> favorites = store.getFavorites(sort, ContactStore.MAX_FAVORITES);
+        // Favourites of the shown list (store.getFavorites always skips hidden contacts, but with
+        // "Visa dolda kontakter" on a hidden favourite belongs in the group too).
+        List<Contact> favorites = new ArrayList<>();
+        for (Contact c : all) {
+            if (c.favorite && favorites.size() < ContactStore.MAX_FAVORITES) {
+                favorites.add(c);
+            }
+        }
         Row favHeader = Row.favoritesHeader(activity.getString(R.string.group_favorites), favorites.size());
         favHeader.members = favorites;
         rows.add(favHeader);
@@ -391,6 +511,9 @@ final class ContactsPane {
         labels.add(activity.getString(favAction));
         actions.add(R.string.action_select_multiple);
         labels.add(activity.getString(R.string.action_select_multiple));
+        int hideAction = c.hidden ? R.string.show_contact : R.string.hide_contact;
+        actions.add(hideAction);
+        labels.add(activity.getString(hideAction));
         actions.add(R.string.action_delete);
         labels.add(activity.getString(R.string.action_delete));
 
@@ -416,6 +539,8 @@ final class ContactsPane {
                         } else if (action == R.string.action_add_favorite
                                 || action == R.string.action_remove_favorite) {
                             toggleFavorite(c);
+                        } else if (action == R.string.hide_contact || action == R.string.show_contact) {
+                            toggleHidden(c);
                         } else if (action == R.string.action_edit) {
                             showEditDialog(c);
                         } else if (action == R.string.action_delete) {
@@ -431,6 +556,13 @@ final class ContactsPane {
         if (!ContactStore.get(activity).setFavorite(c.id, wanted) && wanted) {
             Toast.makeText(activity, R.string.max_favorites, Toast.LENGTH_SHORT).show();
         }
+        activity.refreshPanes();
+    }
+
+    private void toggleHidden(Contact c) {
+        boolean hide = !c.hidden;
+        int changed = ContactStore.get(activity).setHidden(Collections.singletonList(c.id), hide);
+        toastHiddenResult(changed, hide);
         activity.refreshPanes();
     }
 
@@ -467,6 +599,7 @@ final class ContactsPane {
         final EditText priv = body.findViewById(R.id.edit_private_number);
         final Spinner categorySpinner = body.findViewById(R.id.edit_category);
         final CheckBox favoriteBox = body.findViewById(R.id.edit_favorite);
+        final CheckBox hiddenBox = body.findViewById(R.id.edit_hidden);
         final ContactStore store = ContactStore.get(activity);
         final boolean wasFavorite = existing != null && existing.favorite;
         final List<String> cats = new ArrayList<>(store.getCategories());
@@ -513,6 +646,7 @@ final class ContactsPane {
             work.setText(existing.workNumber);
             priv.setText(existing.privateNumber);
         }
+        hiddenBox.setChecked(existing != null && existing.hidden);
 
         final AlertDialog dialog = new AlertDialog.Builder(activity)
                 .setTitle(existing == null ? R.string.dialog_add_contact_title : R.string.dialog_edit_contact_title)
@@ -535,7 +669,8 @@ final class ContactsPane {
                             Toast.makeText(activity, R.string.max_favorites, Toast.LENGTH_SHORT).show();
                         }
                         Contact c = new Contact(existing == null ? null : existing.id,
-                                text(first), text(last), text(work), text(priv), category, favorite);
+                                text(first), text(last), text(work), text(priv), category, favorite,
+                                hiddenBox.isChecked());
                         if (c.isEmpty()) {
                             first.setError(activity.getString(R.string.contact_empty_error));
                             first.requestFocus();
@@ -780,6 +915,7 @@ final class ContactsPane {
         CheckBox selectBox;
         TextView name;
         ImageView star;
+        ImageView hiddenIcon;
         View chipsRow;
         View chipGap;
         View workRow;
@@ -930,6 +1066,7 @@ final class ContactsPane {
                 h.selectBox = row.findViewById(R.id.select_box);
                 h.name = row.findViewById(R.id.contact_name);
                 h.star = row.findViewById(R.id.favorite_star);
+                h.hiddenIcon = row.findViewById(R.id.hidden_icon);
                 h.chipsRow = row.findViewById(R.id.chips_row);
                 h.chipGap = row.findViewById(R.id.chip_gap);
                 h.workRow = row.findViewById(R.id.work_row);
@@ -942,6 +1079,7 @@ final class ContactsPane {
             }
             h.name.setText(nameForDisplay(c));
             h.star.setVisibility(c.favorite ? View.VISIBLE : View.GONE);
+            h.hiddenIcon.setVisibility(c.hidden ? View.VISIBLE : View.GONE);
 
             // Selection mode: check box on the left, the whole row toggles the selection.
             h.selectBox.setVisibility(selecting ? View.VISIBLE : View.GONE);

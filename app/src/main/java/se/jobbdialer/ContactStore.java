@@ -298,10 +298,10 @@ final class ContactStore {
         return n;
     }
 
-    /** Up to {@code max} favorites in the given order. */
+    /** Up to {@code max} visible (not hidden) favorites in the given order. */
     synchronized List<Contact> getFavorites(SortMode sort, int max) {
         List<Contact> result = new ArrayList<>();
-        for (Contact c : getAll(sort)) {
+        for (Contact c : getVisible(sort)) {
             if (c.favorite) {
                 if (result.size() >= max) {
                     break;
@@ -333,6 +333,17 @@ final class ContactStore {
         List<Contact> copy = new ArrayList<>(contacts);
         Collections.sort(copy, comparator(sort));
         return copy;
+    }
+
+    /** Snapshot of the contacts that are not hidden, in the given order. */
+    synchronized List<Contact> getVisible(SortMode sort) {
+        List<Contact> result = new ArrayList<>(contacts.size());
+        for (Contact c : getAll(sort)) {
+            if (!c.hidden) {
+                result.add(c);
+            }
+        }
+        return result;
     }
 
     synchronized boolean isEmpty() {
@@ -403,6 +414,30 @@ final class ContactStore {
             return 0;
         }
         return save() ? removed : -1;
+    }
+
+    /**
+     * Sets the hidden flag of every contact whose id is in {@code ids} and saves once.
+     *
+     * @return the number of contacts whose flag changed (0 when none did, nothing is saved then),
+     *         or -1 when the file could not be written.
+     */
+    synchronized int setHidden(Collection<String> ids, boolean hidden) {
+        if (ids == null || ids.isEmpty()) {
+            return 0;
+        }
+        Set<String> wanted = new HashSet<>(ids);
+        int changed = 0;
+        for (Contact c : contacts) {
+            if (c.hidden != hidden && wanted.contains(c.id)) {
+                c.hidden = hidden;
+                changed++;
+            }
+        }
+        if (changed == 0) {
+            return 0;
+        }
+        return save() ? changed : -1;
     }
 
     // ============================================================================ sorting
@@ -495,7 +530,8 @@ final class ContactStore {
     // ============================================================================ search
 
     /**
-     * Filters on name and numbers. Every whitespace-separated word of the query must match the
+     * Filters on name and numbers; hidden contacts are included (a search is how they are found).
+     * Every whitespace-separated word of the query must match the
      * name (case-insensitive substring) or, when it contains digits, one of the numbers.
      */
     synchronized List<Contact> search(String query, SortMode sort) {

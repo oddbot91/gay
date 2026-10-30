@@ -289,6 +289,7 @@ final class DialPane {
         boolean bestLast;
         if (raw.isEmpty()) {
             // Nothing typed yet: offer the favourites (alphabetical, top to bottom) in the same spot.
+            // Hidden contacts never appear in the dialer (getFavorites / getVisible skip them).
             matches = new ArrayList<>();
             for (Contact c : store.getFavorites(ContactStore.SortMode.LAST_NAME, ContactStore.MAX_FAVORITES)) {
                 boolean work = !Numbers.digitsOnly(c.workNumber).isEmpty();
@@ -298,7 +299,7 @@ final class DialPane {
             }
             bestLast = false;
         } else {
-            matches = ContactMatcher.match(store.getAll(ContactStore.SortMode.LAST_NAME), raw, MAX_MATCHES);
+            matches = ContactMatcher.match(store.getVisible(ContactStore.SortMode.LAST_NAME), raw, MAX_MATCHES);
             bestLast = true;
         }
         if (matchContainer == null) {

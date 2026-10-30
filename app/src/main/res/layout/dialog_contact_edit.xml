@@ -73,5 +73,11 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/space_small"
             android:text="@string/label_favorite" />
+
+        <CheckBox
+            android:id="@+id/edit_hidden"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/edit_hidden_label" />
     </LinearLayout>
 </ScrollView>

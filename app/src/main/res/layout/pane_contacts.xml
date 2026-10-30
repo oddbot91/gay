@@ -83,7 +83,8 @@
             android:tint="@color/on_color" />
     </LinearLayout>
 
-    <!-- Selection mode bar: [N valda] [Markera alla] [Ta bort] [Avbryt]. GONE outside selection mode. -->
+    <!-- Selection mode bar: [N valda] [Åtgärder ▾] [Avbryt]. "Åtgärder" opens a PopupMenu
+         (Markera alla, Dölj valda, Visa valda, Ta bort valda). GONE outside selection mode. -->
     <LinearLayout
         android:id="@+id/selection_bar"
         android:layout_width="match_parent"
@@ -109,15 +110,10 @@
             android:textStyle="bold" />
 
         <Button
-            android:id="@+id/select_all"
+            android:id="@+id/selection_actions"
             style="@style/SelectionBarButton"
-            android:text="@string/selection_select_all" />
-
-        <Button
-            android:id="@+id/delete_selected"
-            style="@style/SelectionBarButton"
-            android:text="@string/action_delete"
-            android:textColor="@color/destructive" />
+            android:contentDescription="@string/selection_actions"
+            android:text="@string/selection_actions_button" />
 
         <Button
             android:id="@+id/cancel_selection"

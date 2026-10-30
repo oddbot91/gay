@@ -64,4 +64,24 @@
         <item quantity="one">%d kontakt togs bort</item>
         <item quantity="other">%d kontakter togs bort</item>
     </plurals>
+
+    <!-- Hidden contacts (1.8) -->
+    <string name="hide_contact">Dölj kontakt</string>
+    <string name="show_contact">Visa kontakt</string>
+    <string name="edit_hidden_label">Dold – visas bara vid sökning</string>
+    <string name="menu_show_hidden">Visa dolda kontakter</string>
+    <string name="cd_hidden">Dold kontakt</string>
+    <string name="selection_actions">Åtgärder</string>
+    <string name="selection_actions_button">Åtgärder ▾</string>
+    <string name="hide_selected">Dölj valda</string>
+    <string name="unhide_selected">Visa valda</string>
+    <string name="delete_selected">Ta bort valda</string>
+    <plurals name="contacts_hidden">
+        <item quantity="one">%d kontakt doldes</item>
+        <item quantity="other">%d kontakter doldes</item>
+    </plurals>
+    <plurals name="contacts_unhidden">
+        <item quantity="one">%d kontakt visas igen</item>
+        <item quantity="other">%d kontakter visas igen</item>
+    </plurals>
 </resources>
