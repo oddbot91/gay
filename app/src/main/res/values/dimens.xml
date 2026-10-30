@@ -31,8 +31,6 @@
     <!-- Lists -->
     <dimen name="row_padding_h">16dp</dimen>
     <dimen name="row_padding_v">8dp</dimen>
-    <dimen name="row_sub_min_height">44dp</dimen>
-    <dimen name="row_icon_size">20dp</dimen>
     <dimen name="recent_icon_size">24dp</dimen>
     <dimen name="recent_row_min_height">64dp</dimen>
     <dimen name="contact_name_text_size">17sp</dimen>

@@ -31,8 +31,9 @@
         android:layout_height="1dp"
         android:background="@color/divider" />
 
-    <!-- Bottom bar: [search] [sort] [+] -->
+    <!-- Bottom bar: [search] [sort] [+]. Replaced by selection_bar in selection mode. -->
     <LinearLayout
+        android:id="@+id/contacts_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
@@ -80,5 +81,47 @@
             android:scaleType="center"
             android:src="@drawable/ic_add"
             android:tint="@color/on_color" />
+    </LinearLayout>
+
+    <!-- Selection mode bar: [N valda] [Markera alla] [Ta bort] [Avbryt]. GONE outside selection mode. -->
+    <LinearLayout
+        android:id="@+id/selection_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:minHeight="@dimen/add_button_size"
+        android:orientation="horizontal"
+        android:paddingLeft="@dimen/space_medium"
+        android:paddingTop="@dimen/space_tiny"
+        android:paddingRight="@dimen/space_tiny"
+        android:paddingBottom="@dimen/space_tiny"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/selection_count"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textColor="?android:attr/textColorPrimary"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <Button
+            android:id="@+id/select_all"
+            style="@style/SelectionBarButton"
+            android:text="@string/selection_select_all" />
+
+        <Button
+            android:id="@+id/delete_selected"
+            style="@style/SelectionBarButton"
+            android:text="@string/action_delete"
+            android:textColor="@color/destructive" />
+
+        <Button
+            android:id="@+id/cancel_selection"
+            style="@style/SelectionBarButton"
+            android:text="@string/cancel" />
     </LinearLayout>
 </LinearLayout>

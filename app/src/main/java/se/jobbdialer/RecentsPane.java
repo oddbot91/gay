@@ -16,8 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * "Senaste" pane: the app's own call history. Tap = call the exact same full number again
- * (no re-prefixing), long-press = remove the entry / clear everything.
+ * "Senaste" pane: the app's own call history. Tap = put the number that was actually dialed
+ * (incl. a possible #31#) into the dial pane, nothing is called yet. Long-press = call the exact
+ * same full number again right away (no re-prefixing) / remove the entry / clear everything.
  */
 final class RecentsPane {
 
@@ -36,8 +37,7 @@ final class RecentsPane {
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 CallRecord r = adapter.getItem(position);
                 if (r != null) {
-                    // Dialer.redial adds a new history entry itself (via recordCall).
-                    RecentsPane.this.activity.getDialer().redial(r);
+                    RecentsPane.this.activity.openDialerWith(r.dialedNumber);
                 }
             }
         });
@@ -63,6 +63,7 @@ final class RecentsPane {
             return;
         }
         String[] items = {
+                activity.getString(R.string.action_redial_direct),
                 activity.getString(R.string.action_delete),
                 activity.getString(R.string.action_clear_all)};
         new AlertDialog.Builder(activity)
@@ -71,9 +72,12 @@ final class RecentsPane {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         if (which == 0) {
+                            // Dialer.redial adds a new history entry itself (via recordCall).
+                            activity.getDialer().redial(r);
+                        } else if (which == 1) {
                             RecentsStore.get(activity).remove(r);
                             refresh();
-                        } else if (which == 1) {
+                        } else if (which == 2) {
                             confirmClear();
                         }
                     }

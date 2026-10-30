@@ -13,8 +13,8 @@ Kräver Android 8.0 (API 26) eller senare.
 
 Ovanför knappsatsen finns en lägesväljare med två segment: **Internt | Patient**.
 Det valda läget fylls med lägets färg (grönt respektive lila) och appen minns ditt val.
-Under knappsatsen finns en enda stor ringknapp och till vänster om den backstegsknappen
-(tryck = radera en siffra, håll in = rensa fältet).
+Under knappsatsen finns en enda stor ringknapp, till vänster om den backstegsknappen
+(tryck = radera en siffra, håll in = rensa fältet) och till höger en **SMS-knapp** (se nedan).
 
 - **Tomt nummerfält:** knappen heter **RING VÄXELN**, är blå och ringer växelnumret utan prefix
   (standard `0313427000`). Underraden visar växelnumret. Är inget växelnummer inställt är
@@ -38,16 +38,44 @@ Under knappsatsen finns en enda stor ringknapp och till vänster om den backsteg
   ifyllt, och du trycker på ring där.
 - Om du håller in appikonen visas genvägen **Ring växeln**.
 
+### SMS-knappen
+
+Pratbubblan till höger om ringknappen öppnar telefonens SMS-app med numret i fältet som
+mottagare. Knappen är grå och inaktiv när fältet är tomt. Ett inledande `#31#`/`*31#` tas
+bort (dolt nummer gäller bara samtal). Ett fullständigt nummer (börjar med 0 eller + och har
+minst 8 siffror) används som det är, ett kortnummer får internprefixet, t.ex. `30771` →
+`0313430771`. Appen behöver ingen SMS-behörighet; finns ingen SMS-app visas
+”Hittade ingen SMS-app”.
+
+### Byt flik genom att svepa
+
+Svep åt vänster eller höger var som helst på skärmen för att gå till fliken bredvid
+(Ring ↔ Kontakter ↔ Senaste). Det går inte runt från sista till första fliken. Panelerna
+glider in från sidan, både när du sveper och när du trycker på flikarna längst ner. Listor
+rullar som vanligt uppåt och nedåt; bara tydligt vågräta svep byter flik.
+
 ### Telefonbok
 
 - Varje kontakt har förnamn, efternamn, jobbnr (kortnummer) och privatnr.
-- Tryck på **Jobb 30771** för att ringa internt (med prefix). Tryck på
-  **Privat 070-444 44 44** för att ringa privatnumret som det är, utan prefix.
-- Håll in en kontakt för att välja **Ring privat med dolt nummer (#31#)**, **Lägg till i
-  favoriter** / **Ta bort från favoriter**, **Redigera** eller **Ta bort**.
+- Under namnet visas numren bredvid varandra som två knappar: **Jobb 30771** och
+  **Privat 070-444 44 44**. Saknas det ena numret tar det andra hela bredden.
+- Tryck på ett nummer för att **fylla i det i knappsatsen**: appen byter till fliken Ring med
+  numret inslaget. Inget rings förrän du trycker på ringknappen. Lägesväljaren ändras inte
+  (ett mobilnummer rings som det är även i läget Internt).
+- Håll in en kontakt för menyn: **Ring jobbnr direkt**, **Ring privat direkt**, **Ring privat
+  med dolt nummer (#31#)**, **Skicka SMS** (till privatnumret), **Redigera**, **Lägg till i
+  favoriter** / **Ta bort från favoriter**, **Välj flera…** och **Ta bort**. Menyposter för
+  nummer som saknas visas inte.
 - Du kan söka på namn och nummer. Listan kan sorteras på efternamn, förnamn, jobbnr eller
   privatnr, och appen kommer ihåg valet.
 - Kontakterna kan ordnas i **kategorier** och **favoriter** (se nedan).
+- **Markera flera och ta bort på en gång:** välj **Välj flera…** i kontaktens meny eller
+  **Välj kontakter** i menyn (⋮). Varje kontakt får en kryssruta; tryck på en kontakt för att
+  markera eller avmarkera den. Tryck på en grupprubrik för att markera (eller avmarkera) alla
+  kontakter i gruppen – gruppen fälls ut. Rubriken Favoriter markerar alla favoriter.
+  Längst ner visas i stället för sökfältet `N valda`, **Markera alla** (alla kontakter, eller
+  sökträffarna om du har sökt), **Ta bort** och **Avbryt**. **Ta bort** frågar först
+  ”Ta bort N kontakter?”. Bakåtknappen avslutar markeringsläget.
 - Sökfältet, sorteringen och knappen **+** (ny kontakt) ligger längst ner, nära tummen, och
   listan fylls nerifrån, så att gruppen Favoriter hamnar precis ovanför sökfältet.
 
@@ -92,8 +120,10 @@ utfälld, och en liten stjärna visas efter namnet. Du kan ha högst 10 favorite
 Här listas de samtal som har ringts från appen: namn (om det är känt), nummer, ringläge och
 tidpunkt. Listan sparar högst 200 samtal.
 
-- Tryck på ett samtal för att ringa exakt samma nummer igen.
-- Håll in ett samtal för att **Ta bort** det eller **Rensa alla**.
+- Tryck på ett samtal för att fylla i numret som ringdes (inklusive ett ev. `#31#`) i
+  knappsatsen. Inget rings förrän du trycker på ringknappen.
+- Håll in ett samtal för **Ring igen direkt** (exakt samma nummer och läge), **Ta bort** eller
+  **Rensa alla**.
 
 ### Export och import av kontakter
 

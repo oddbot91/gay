@@ -11,8 +11,10 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.GestureDetector;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -23,7 +25,8 @@ import android.widget.ViewFlipper;
 
 /**
  * The single main screen: toolbar with overflow menu, a ViewFlipper with the three panes
- * (Ring / Kontakter / Senaste) and a bottom tab bar. Also handles the launcher shortcut
+ * (Ring / Kontakter / Senaste) and a bottom tab bar; horizontal flings anywhere on the screen
+ * switch to the neighbouring tab (slide animations). Also handles the launcher shortcut
  * ("Ring växeln"), the CALL_PHONE permission result, the call log sweep in onResume() and the
  * Storage Access Framework results for contact export/import (shared with SettingsActivity).
  */
@@ -41,6 +44,11 @@ public class MainActivity extends Activity {
     private static final String MIME_JSON = "application/json";
     private static final String STATE_TAB = "main_tab";
 
+    /** Swipe between tabs: minimum horizontal distance (dp) and speed (dp/s); dx must dominate dy. */
+    private static final float SWIPE_MIN_DISTANCE_DP = 80f;
+    private static final float SWIPE_MIN_VELOCITY_DP = 400f;
+    private static final float SWIPE_DOMINANCE = 2f;
+
     static final int TAB_DIAL = 0;
     static final int TAB_CONTACTS = 1;
     static final int TAB_RECENTS = 2;
@@ -53,6 +61,9 @@ public class MainActivity extends Activity {
     private ContactsPane contactsPane;
     private RecentsPane recentsPane;
     private int currentTab = TAB_DIAL;
+    private GestureDetector gestureDetector;
+    /** Set by the fling listener while the current ACTION_UP completed a tab swipe. */
+    private boolean swipeHandled;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,7 +111,9 @@ public class MainActivity extends Activity {
         }
 
         int tab = savedInstanceState == null ? TAB_DIAL : savedInstanceState.getInt(STATE_TAB, TAB_DIAL);
-        showTab(tab);
+        showTab(tab, false); // restoring: no slide animation
+
+        setupSwipe();
 
         if (savedInstanceState == null) {
             Intent startIntent = getIntent();
@@ -133,6 +146,69 @@ public class MainActivity extends Activity {
                 .setNegativeButton(R.string.call_log_prompt_later, null)
                 .setCancelable(true)
                 .show();
+    }
+
+    /** Horizontal fling = neighbouring tab (no wrap-around). Vertical scrolling is not affected. */
+    private void setupSwipe() {
+        final float density = getResources().getDisplayMetrics().density;
+        final float minDistance = SWIPE_MIN_DISTANCE_DP * density;
+        final float minVelocity = SWIPE_MIN_VELOCITY_DP * density;
+        gestureDetector = new GestureDetector(this, new GestureDetector.SimpleOnGestureListener() {
+            @Override
+            public boolean onFling(MotionEvent e1, MotionEvent e2, float velocityX, float velocityY) {
+                if (e1 == null || e2 == null) {
+                    return false;
+                }
+                float dx = e2.getRawX() - e1.getRawX();
+                float dy = e2.getRawY() - e1.getRawY();
+                if (Math.abs(dx) <= Math.abs(dy) * SWIPE_DOMINANCE
+                        || Math.abs(dx) <= minDistance
+                        || Math.abs(velocityX) <= minVelocity) {
+                    return false;
+                }
+                // Finger moves left = content moves left = next (higher) tab.
+                int target = dx < 0 ? currentTab + 1 : currentTab - 1;
+                if (target < TAB_DIAL || target > TAB_RECENTS) {
+                    return false;
+                }
+                showTab(target);
+                swipeHandled = true;
+                return true;
+            }
+        });
+    }
+
+    /**
+     * Observes every touch for the tab swipe; the views still get all events as usual (lists and
+     * scroll views keep working). Only when an ACTION_UP completed a tab swipe is it delivered to
+     * the views as ACTION_CANCEL, so the swipe does not also click the chip/key/row it ended on.
+     */
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        swipeHandled = false;
+        if (gestureDetector != null) {
+            gestureDetector.onTouchEvent(ev);
+        }
+        if (swipeHandled && ev.getActionMasked() == MotionEvent.ACTION_UP) {
+            swipeHandled = false;
+            int action = ev.getAction();
+            ev.setAction(MotionEvent.ACTION_CANCEL);
+            boolean handled = super.dispatchTouchEvent(ev);
+            ev.setAction(action);
+            return handled;
+        }
+        return super.dispatchTouchEvent(ev);
+    }
+
+    // Activity.onBackPressed is the framework API (OnBackPressedDispatcher is AndroidX).
+    @SuppressWarnings("deprecation")
+    @Override
+    public void onBackPressed() {
+        if (contactsPane != null && contactsPane.isSelecting()) {
+            contactsPane.exitSelection();
+            return;
+        }
+        super.onBackPressed();
     }
 
     @Override
@@ -212,15 +288,61 @@ public class MainActivity extends Activity {
         recentsPane.refresh();
     }
 
+    /**
+     * Shows the dial pane with {@code number} filled in (cursor at the end). Nothing is dialed
+     * until the user presses the call button; the mode selector is left as it is.
+     */
+    void openDialerWith(String number) {
+        dialPane.setNumber(number);
+        showTab(TAB_DIAL);
+    }
+
+    /**
+     * Opens the SMS app with {@code number} as the recipient (no permission needed). Shared by the
+     * dial pane's SMS button and the contact menu.
+     */
+    static void sendSms(Activity activity, String number) {
+        String target = Numbers.clean(number);
+        if (target.isEmpty()) {
+            Toast.makeText(activity, R.string.toast_no_number, Toast.LENGTH_SHORT).show();
+            return;
+        }
+        Intent intent = new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:" + Uri.encode(target)));
+        try {
+            activity.startActivity(intent);
+        } catch (ActivityNotFoundException e) {
+            Toast.makeText(activity, R.string.no_sms_app, Toast.LENGTH_SHORT).show();
+        } catch (RuntimeException e) {
+            Log.w(TAG, "Could not open the SMS app", e);
+            Toast.makeText(activity, R.string.no_sms_app, Toast.LENGTH_SHORT).show();
+        }
+    }
+
     // ============================================================================ tabs / menu
 
+    /** User-initiated tab switch (tab bar, swipe, menu): with slide animation. */
     void showTab(int index) {
+        showTab(index, true);
+    }
+
+    private void showTab(int index, boolean animate) {
         int tab = (index < TAB_DIAL || index > TAB_RECENTS) ? TAB_DIAL : index;
         if (tab != TAB_CONTACTS) {
             hideKeyboard();
         }
+        int shown = flipper.getDisplayedChild();
         currentTab = tab;
-        if (flipper.getDisplayedChild() != tab) {
+        if (shown != tab) {
+            if (!animate) {
+                flipper.setInAnimation((android.view.animation.Animation) null);
+                flipper.setOutAnimation((android.view.animation.Animation) null);
+            } else if (tab > shown) {
+                flipper.setInAnimation(this, R.anim.slide_in_right);
+                flipper.setOutAnimation(this, R.anim.slide_out_left);
+            } else {
+                flipper.setInAnimation(this, R.anim.slide_in_left);
+                flipper.setOutAnimation(this, R.anim.slide_out_right);
+            }
             flipper.setDisplayedChild(tab);
         }
         for (int i = 0; i < tabs.length; i++) {
@@ -228,7 +350,7 @@ public class MainActivity extends Activity {
         }
     }
 
-    private void hideKeyboard() {
+    void hideKeyboard() {
         try {
             InputMethodManager imm = getSystemService(InputMethodManager.class);
             View focus = getCurrentFocus();
@@ -247,6 +369,11 @@ public class MainActivity extends Activity {
             } catch (RuntimeException e) {
                 Log.w(TAG, "Could not open settings", e);
             }
+            return true;
+        }
+        if (id == R.id.action_select) {
+            showTab(TAB_CONTACTS);
+            contactsPane.enterSelection();
             return true;
         }
         if (id == R.id.action_categories) {

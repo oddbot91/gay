@@ -42,4 +42,26 @@
     <string name="import_paste_help">En kontakt per rad:\nFörnamn Efternamn ; Jobbnr ; Privatnr ; Kategori\nSeparatorn kan vara semikolon, tab eller komma. Sista ordet i namnet blir efternamn. Jobbnr, privatnr och kategori är valfria. Kategorier som saknas skapas. En rubrikrad hoppas över.</string>
     <string name="import_paste_empty">Klistra in minst en rad.</string>
     <string name="import_action">Importera</string>
+
+    <!-- Contact long-press menu (1.7) -->
+    <string name="action_call_work_direct">Ring jobbnr direkt</string>
+    <string name="action_call_private_direct">Ring privat direkt</string>
+    <string name="action_send_sms">Skicka SMS</string>
+    <string name="action_select_multiple">Välj flera…</string>
+
+    <!-- Selection mode / bulk delete -->
+    <string name="menu_select_contacts">Välj kontakter</string>
+    <string name="selection_select_all">Markera alla</string>
+    <plurals name="selection_count">
+        <item quantity="one">%d vald</item>
+        <item quantity="other">%d valda</item>
+    </plurals>
+    <plurals name="confirm_delete_contacts">
+        <item quantity="one">Ta bort %d kontakt?</item>
+        <item quantity="other">Ta bort %d kontakter?</item>
+    </plurals>
+    <plurals name="contacts_deleted">
+        <item quantity="one">%d kontakt togs bort</item>
+        <item quantity="other">%d kontakter togs bort</item>
+    </plurals>
 </resources>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Number "chip" in a contact row: rounded rectangle in the keypad surface colour (night variant
+     via keypad_bg) with a ripple, so the chip shows press feedback like
+     ?android:attr/selectableItemBackground but keeps its own rounded fill. -->
+<ripple xmlns:android="http://schemas.android.com/apk/res/android"
+    android:color="@color/ripple_neutral">
+    <item>
+        <selector>
+            <item android:state_pressed="true">
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/keypad_pressed" />
+                    <corners android:radius="@dimen/chip_radius" />
+                </shape>
+            </item>
+            <item>
+                <shape android:shape="rectangle">
+                    <solid android:color="@color/keypad_bg" />
+                    <corners android:radius="@dimen/chip_radius" />
+                </shape>
+            </item>
+        </selector>
+    </item>
+</ripple>

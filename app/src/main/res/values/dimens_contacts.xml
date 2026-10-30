@@ -10,4 +10,13 @@
     <dimen name="contact_row_padding_start">24dp</dimen>
     <!-- Round "+" button in the contacts bottom bar. -->
     <dimen name="add_button_size">40dp</dimen>
+    <!-- Number chips in a contact row (row_contact.xml, chip_bg.xml). -->
+    <dimen name="chip_min_height">40dp</dimen>
+    <dimen name="chip_radius">12dp</dimen>
+    <dimen name="chip_padding_h">10dp</dimen>
+    <dimen name="chip_gap">8dp</dimen>
+    <dimen name="chip_icon_size">18dp</dimen>
+    <dimen name="chip_text_size">14sp</dimen>
+    <!-- Selection mode: check box left of the name. -->
+    <dimen name="select_box_gap">8dp</dimen>
 </resources>

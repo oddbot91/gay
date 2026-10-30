@@ -18,7 +18,7 @@ import java.util.List;
 /**
  * "Ring" pane: number field with the app's own keypad (with T9 letters), up to five matching
  * contacts (T9 name matches first, then number matches; see {@link ContactMatcher}), a mode
- * selector (Internt / Patient) and a bottom row with the single call button and backspace.
+ * selector (Internt / Patient) and a bottom row [backspace][call button][SMS].
  * With an empty number field the call button calls the switchboard; otherwise it calls the
  * typed number in the selected mode. Placing the call (and recording it in the history / call
  * log cleanup) is done by {@link Dialer}.
@@ -41,6 +41,7 @@ final class DialPane {
     private final View callButton;
     private final TextView callTitle;
     private final TextView callSub;
+    private final View smsButton;
     private Dialer.CallMode mode;
 
     DialPane(MainActivity activity, View root) {
@@ -53,6 +54,7 @@ final class DialPane {
         callButton = root.findViewById(R.id.call_button);
         callTitle = root.findViewById(R.id.call_title);
         callSub = root.findViewById(R.id.call_sub);
+        smsButton = root.findViewById(R.id.sms_button);
         mode = activity.getPrefs().getDialMode();
 
         for (int i = 0; i < segments.length; i++) {
@@ -126,7 +128,52 @@ final class DialPane {
             }
         });
 
+        smsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String target = smsTarget(activity.getPrefs(), input());
+                if (target.isEmpty()) {
+                    Toast.makeText(activity, R.string.toast_no_number, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                MainActivity.sendSms(activity, target);
+            }
+        });
+
         refresh();
+    }
+
+    /**
+     * Puts {@code number} into the field (cleaned, cursor at the end). The TextWatcher then
+     * updates the suggestions and the call / SMS buttons. Nothing is dialed.
+     */
+    void setNumber(String number) {
+        numberField.setText(Numbers.clean(number));
+        numberField.setSelection(numberField.length());
+    }
+
+    /**
+     * The SMS recipient for the typed input: without a leading #31# / *31# (hide caller id makes
+     * no sense for SMS), a full number as-is, otherwise internal prefix + extension
+     * (Dialer.buildNumber INTERNAL, which never doubles the prefix). "" when nothing is left.
+     */
+    static String smsTarget(Prefs prefs, String input) {
+        String c = Numbers.clean(input);
+        boolean stripped = true;
+        while (stripped) {
+            stripped = false;
+            if (c.startsWith(Numbers.HIDE_PREFIX_HASH)) {
+                c = c.substring(Numbers.HIDE_PREFIX_HASH.length());
+                stripped = true;
+            } else if (c.startsWith(Numbers.HIDE_PREFIX_STAR)) {
+                c = c.substring(Numbers.HIDE_PREFIX_STAR.length());
+                stripped = true;
+            }
+        }
+        if (c.isEmpty()) {
+            return "";
+        }
+        return Numbers.isFullNumber(c) ? c : Dialer.buildNumber(prefs, Dialer.CallMode.INTERNAL, c);
     }
 
     /** Re-reads settings (prefixes, switchboard, mode) and contacts. */
@@ -191,6 +238,9 @@ final class DialPane {
         String raw = Numbers.clean(input());
         updateModeAndCallButton(raw);
         updateMatches(raw);
+        boolean smsEnabled = !raw.isEmpty();
+        smsButton.setEnabled(smsEnabled);
+        smsButton.setAlpha(smsEnabled ? 1f : 0.4f);
     }
 
     /** Tints the mode selector and the call button and sets the call button texts. */

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Destructive action text ("Ta bort" in the contacts selection bar). Night variant in
+         values-night/colors_contacts.xml. -->
+    <color name="destructive">#FFC62828</color>
+</resources>

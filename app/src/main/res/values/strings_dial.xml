@@ -5,4 +5,11 @@
     <string name="toast_contact_no_number">%1$s har inget telefonnummer – lägg till ett under Kontakter.</string>
     <!-- %1$s = T9 digits computed for "Bögen" at runtime, %2$s = ✓ or ✗, %3$d = number of contacts -->
     <string name="t9_selftest">Självtest T9: Bögen → %1$s %2$s · %3$d kontakter i telefonboken</string>
+
+    <!-- SMS button next to the call button (1.7) -->
+    <string name="cd_sms">Skicka SMS</string>
+    <string name="no_sms_app">Hittade ingen SMS-app</string>
+
+    <!-- Recents long-press menu: call the same full number again immediately -->
+    <string name="action_redial_direct">Ring igen direkt</string>
 </resources>

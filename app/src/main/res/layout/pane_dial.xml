@@ -244,8 +244,9 @@
             </LinearLayout>
         </LinearLayout>
 
-        <!-- Bottom row: a square backspace button on the left and the single call button (tinted
-             in code: switchboard colour when the field is empty, else the selected mode's colour). -->
+        <!-- Bottom row: [backspace] [call button] [SMS]. The call button is tinted in code
+             (switchboard colour when the field is empty, else the selected mode's colour); the
+             SMS button is disabled (alpha 0.4) while the field is empty. -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -280,6 +281,17 @@
                     android:id="@+id/call_sub"
                     style="@style/CallButtonSubtitle" />
             </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/sms_button"
+                android:layout_width="@dimen/call_button_min_height"
+                android:layout_height="@dimen/call_button_min_height"
+                android:layout_marginStart="@dimen/backspace_gap"
+                android:background="@drawable/btn_backspace"
+                android:contentDescription="@string/cd_sms"
+                android:scaleType="center"
+                android:src="@drawable/ic_sms"
+                android:tint="?android:attr/textColorPrimary" />
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

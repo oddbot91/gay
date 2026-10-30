@@ -20,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.text.Collator;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -378,6 +379,30 @@ final class ContactStore {
             }
         }
         return false;
+    }
+
+    /**
+     * Removes every contact whose id is in {@code ids} and saves once.
+     *
+     * @return the number of contacts removed (0 when none matched, nothing is saved then), or -1
+     *         when contacts were removed but the file could not be written.
+     */
+    synchronized int deleteAll(Collection<String> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return 0;
+        }
+        Set<String> wanted = new HashSet<>(ids);
+        int removed = 0;
+        for (int i = contacts.size() - 1; i >= 0; i--) {
+            if (wanted.contains(contacts.get(i).id)) {
+                contacts.remove(i);
+                removed++;
+            }
+        }
+        if (removed == 0) {
+            return 0;
+        }
+        return save() ? removed : -1;
     }
 
     // ============================================================================ sorting

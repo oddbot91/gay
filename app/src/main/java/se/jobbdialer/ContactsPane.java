@@ -27,13 +27,20 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
 /**
  * "Kontakter" pane: search, sortable list, add/edit/delete and the long-press menu.
- * Tapping "Jobb ..." calls internally (with prefix), tapping "Privat ..." calls the private
- * number as-is. The list is grouped by category (collapsible) with a "Favoriter" group last.
+ * Tapping the "Jobb ..." / "Privat ..." chip fills that number into the dial pane (nothing is
+ * dialed until the user presses the call button); direct calls are in the long-press menu.
+ * The list is grouped by category (collapsible) with a "Favoriter" group last.
+ *
+ * <p>Selection mode (long-press "Välj flera…" or the toolbar menu "Välj kontakter"): check boxes
+ * on the rows, tap = toggle, tap on a group header = toggle the whole group, and the bottom bar is
+ * replaced by a selection bar (count, "Markera alla", "Ta bort", "Avbryt"). The selection is a set
+ * of contact ids kept in memory only.
  */
 final class ContactsPane {
 
@@ -47,18 +54,35 @@ final class ContactsPane {
     /** Key of the "Övriga" group (cannot clash with a user category name). */
     private static final String KEY_OTHER = "\u0000other";
 
+    private final View contactsBar;
+    private final View selectionBar;
+    private final TextView selectionCount;
+    private final View deleteSelectedButton;
+    /** Selection mode state: ids of the selected contacts (in memory only). */
+    private final Set<String> selected = new LinkedHashSet<>();
+    private boolean selecting;
+
     ContactsPane(MainActivity activity, View root) {
         this.activity = activity;
         searchField = root.findViewById(R.id.search_field);
         sortButton = root.findViewById(R.id.sort_button);
         emptyText = root.findViewById(R.id.contacts_empty);
+        contactsBar = root.findViewById(R.id.contacts_bar);
+        selectionBar = root.findViewById(R.id.selection_bar);
+        selectionCount = root.findViewById(R.id.selection_count);
+        deleteSelectedButton = root.findViewById(R.id.delete_selected);
         ListView list = root.findViewById(R.id.contacts_list);
         list.setAdapter(adapter);
         list.setEmptyView(emptyText);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                adapter.toggleGroup(position);
+                // Only headers get here: contact rows handle their own clicks.
+                if (selecting) {
+                    adapter.toggleGroupSelection(position);
+                } else {
+                    adapter.toggleGroup(position);
+                }
             }
         });
 
@@ -88,6 +112,25 @@ final class ContactsPane {
                 showEditDialog(null);
             }
         });
+        root.findViewById(R.id.select_all).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectAllVisible();
+            }
+        });
+        deleteSelectedButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                confirmDeleteSelected();
+            }
+        });
+        root.findViewById(R.id.cancel_selection).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                exitSelection();
+            }
+        });
+        updateSelectionUi();
         refresh();
     }
 
@@ -99,8 +142,112 @@ final class ContactsPane {
         ContactStore store = ContactStore.get(activity);
         Editable q = searchField.getText();
         String query = q == null ? "" : q.toString();
+        if (!selected.isEmpty()) {
+            // Drop ids of contacts that no longer exist (deleted, replaced by an import, ...).
+            Set<String> existing = new HashSet<>();
+            for (Contact c : store.getAll(sort)) {
+                existing.add(c.id);
+            }
+            selected.retainAll(existing);
+        }
         adapter.setRows(buildRows(store, query, sort));
         emptyText.setText(store.isEmpty() ? R.string.contacts_empty : R.string.contacts_no_match);
+        updateSelectionUi();
+    }
+
+    private String currentQuery() {
+        Editable q = searchField.getText();
+        return q == null ? "" : q.toString();
+    }
+
+    // ============================================================================ selection mode
+
+    boolean isSelecting() {
+        return selecting;
+    }
+
+    /** Starts selection mode with nothing selected (toolbar menu "Välj kontakter"). */
+    void enterSelection() {
+        enterSelection(null);
+    }
+
+    /** Starts selection mode; {@code first} (may be null) is selected right away. */
+    private void enterSelection(Contact first) {
+        selecting = true;
+        if (first != null) {
+            selected.add(first.id);
+        }
+        // The search field is hidden behind the selection bar: close the keyboard.
+        activity.hideKeyboard();
+        searchField.clearFocus();
+        updateSelectionUi();
+        adapter.notifyDataSetChanged();
+    }
+
+    /** Leaves selection mode and forgets the selection (Avbryt, Back, after a delete). */
+    void exitSelection() {
+        selecting = false;
+        selected.clear();
+        updateSelectionUi();
+        adapter.notifyDataSetChanged();
+    }
+
+    private void toggleSelected(Contact c) {
+        if (!selected.remove(c.id)) {
+            selected.add(c.id);
+        }
+        updateSelectionUi();
+        adapter.notifyDataSetChanged();
+    }
+
+    /** "Markera alla": every contact, or the search hits while a search is active. */
+    private void selectAllVisible() {
+        ContactStore store = ContactStore.get(activity);
+        ContactStore.SortMode sort = activity.getPrefs().getContactSort();
+        String query = currentQuery();
+        List<Contact> visible = query.trim().isEmpty() ? store.getAll(sort) : store.search(query, sort);
+        for (Contact c : visible) {
+            selected.add(c.id);
+        }
+        updateSelectionUi();
+        adapter.notifyDataSetChanged();
+    }
+
+    /** Shows the normal bottom bar or the selection bar, with the count and delete state. */
+    private void updateSelectionUi() {
+        contactsBar.setVisibility(selecting ? View.GONE : View.VISIBLE);
+        selectionBar.setVisibility(selecting ? View.VISIBLE : View.GONE);
+        int n = selected.size();
+        selectionCount.setText(activity.getResources().getQuantityString(R.plurals.selection_count, n, n));
+        deleteSelectedButton.setEnabled(n > 0);
+        deleteSelectedButton.setAlpha(n > 0 ? 1f : 0.4f);
+    }
+
+    private void confirmDeleteSelected() {
+        if (!canShowDialog() || selected.isEmpty()) {
+            return;
+        }
+        final List<String> ids = new ArrayList<>(selected);
+        int n = ids.size();
+        new AlertDialog.Builder(activity)
+                .setMessage(activity.getResources().getQuantityString(R.plurals.confirm_delete_contacts, n, n))
+                .setPositiveButton(R.string.action_delete, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        int removed = ContactStore.get(activity).deleteAll(ids);
+                        if (removed < 0) {
+                            Toast.makeText(activity, R.string.save_failed, Toast.LENGTH_SHORT).show();
+                        } else {
+                            Toast.makeText(activity, activity.getResources()
+                                    .getQuantityString(R.plurals.contacts_deleted, removed, removed),
+                                    Toast.LENGTH_SHORT).show();
+                        }
+                        exitSelection();
+                        activity.refreshPanes();
+                    }
+                })
+                .setNegativeButton(R.string.cancel, null)
+                .show();
     }
 
     /** Flat rows while searching, otherwise category groups + "Övriga" + "Favoriter". */
@@ -125,7 +272,9 @@ final class ContactsPane {
             addGroup(rows, KEY_OTHER, activity.getString(R.string.group_other), others);
         }
         List<Contact> favorites = store.getFavorites(sort, ContactStore.MAX_FAVORITES);
-        rows.add(Row.favoritesHeader(activity.getString(R.string.group_favorites), favorites.size()));
+        Row favHeader = Row.favoritesHeader(activity.getString(R.string.group_favorites), favorites.size());
+        favHeader.members = favorites;
+        rows.add(favHeader);
         for (Contact c : favorites) {
             rows.add(Row.contact(c));
         }
@@ -144,7 +293,9 @@ final class ContactsPane {
 
     private void addGroup(List<Row> rows, String key, String title, List<Contact> members) {
         boolean open = expanded.contains(key);
-        rows.add(Row.header(key, title, members.size(), open));
+        Row header = Row.header(key, title, members.size(), open);
+        header.members = members;
+        rows.add(header);
         if (open) {
             for (Contact c : members) {
                 rows.add(Row.contact(c));
@@ -218,18 +369,28 @@ final class ContactsPane {
         }
         final List<Integer> actions = new ArrayList<>();
         final List<String> labels = new ArrayList<>();
+        if (c.hasWork()) {
+            actions.add(R.string.action_call_work_direct);
+            labels.add(activity.getString(R.string.action_call_work_direct));
+        }
         if (c.hasPrivate()) {
+            actions.add(R.string.action_call_private_direct);
+            labels.add(activity.getString(R.string.action_call_private_direct));
             String prefix = Numbers.clean(activity.getPrefs().getPrefixPatient());
             actions.add(R.string.action_call_private_hidden);
             labels.add(prefix.isEmpty()
                     ? activity.getString(R.string.action_call_private_hidden_plain)
                     : activity.getString(R.string.action_call_private_hidden, prefix));
+            actions.add(R.string.action_send_sms);
+            labels.add(activity.getString(R.string.action_send_sms));
         }
+        actions.add(R.string.action_edit);
+        labels.add(activity.getString(R.string.action_edit));
         int favAction = c.favorite ? R.string.action_remove_favorite : R.string.action_add_favorite;
         actions.add(favAction);
         labels.add(activity.getString(favAction));
-        actions.add(R.string.action_edit);
-        labels.add(activity.getString(R.string.action_edit));
+        actions.add(R.string.action_select_multiple);
+        labels.add(activity.getString(R.string.action_select_multiple));
         actions.add(R.string.action_delete);
         labels.add(activity.getString(R.string.action_delete));
 
@@ -242,8 +403,16 @@ final class ContactsPane {
                             return;
                         }
                         int action = actions.get(which);
-                        if (action == R.string.action_call_private_hidden) {
+                        if (action == R.string.action_call_work_direct) {
+                            callWork(c);
+                        } else if (action == R.string.action_call_private_direct) {
+                            callPrivate(c);
+                        } else if (action == R.string.action_call_private_hidden) {
                             callPrivateHidden(c);
+                        } else if (action == R.string.action_send_sms) {
+                            MainActivity.sendSms(activity, c.privateNumber);
+                        } else if (action == R.string.action_select_multiple) {
+                            enterSelection(c);
                         } else if (action == R.string.action_add_favorite
                                 || action == R.string.action_remove_favorite) {
                             toggleFavorite(c);
@@ -583,6 +752,7 @@ final class ContactsPane {
         int count;
         boolean expanded;
         boolean favorites;    // the always-open "Favoriter" header
+        List<Contact> members = new ArrayList<>(); // headers: every contact of the group
 
         static Row contact(Contact c) {
             Row r = new Row();
@@ -607,8 +777,11 @@ final class ContactsPane {
     }
 
     private static final class Holder {
+        CheckBox selectBox;
         TextView name;
         ImageView star;
+        View chipsRow;
+        View chipGap;
         View workRow;
         TextView workText;
         View privateRow;
@@ -648,6 +821,38 @@ final class ContactsPane {
                 expanded.add(r.key);
             }
             refresh();
+        }
+
+        /**
+         * Tap on a header in selection mode: selects every contact of the group, or deselects
+         * them all when they already are all selected. A collapsed group is expanded.
+         */
+        void toggleGroupSelection(int position) {
+            if (position < 0 || position >= rows.size()) {
+                return;
+            }
+            Row r = rows.get(position);
+            if (r.contact != null || r.members.isEmpty()) {
+                return;
+            }
+            boolean allSelected = true;
+            for (Contact c : r.members) {
+                if (!selected.contains(c.id)) {
+                    allSelected = false;
+                    break;
+                }
+            }
+            for (Contact c : r.members) {
+                if (allSelected) {
+                    selected.remove(c.id);
+                } else {
+                    selected.add(c.id);
+                }
+            }
+            if (!r.favorites && r.key != null) {
+                expanded.add(r.key);
+            }
+            refresh(); // rebuilds the rows (expanded group) and updates the selection bar
         }
 
         @Override
@@ -722,8 +927,11 @@ final class ContactsPane {
             if (row == null) {
                 row = LayoutInflater.from(activity).inflate(R.layout.row_contact, parent, false);
                 h = new Holder();
+                h.selectBox = row.findViewById(R.id.select_box);
                 h.name = row.findViewById(R.id.contact_name);
                 h.star = row.findViewById(R.id.favorite_star);
+                h.chipsRow = row.findViewById(R.id.chips_row);
+                h.chipGap = row.findViewById(R.id.chip_gap);
                 h.workRow = row.findViewById(R.id.work_row);
                 h.workText = row.findViewById(R.id.work_text);
                 h.privateRow = row.findViewById(R.id.private_row);
@@ -735,47 +943,84 @@ final class ContactsPane {
             h.name.setText(nameForDisplay(c));
             h.star.setVisibility(c.favorite ? View.VISIBLE : View.GONE);
 
+            // Selection mode: check box on the left, the whole row toggles the selection.
+            h.selectBox.setVisibility(selecting ? View.VISIBLE : View.GONE);
+            h.selectBox.setChecked(selecting && selected.contains(c.id));
+            if (selecting) {
+                row.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        toggleSelected(c);
+                    }
+                });
+            } else {
+                row.setOnClickListener(null);
+                row.setClickable(false);
+            }
+
             View.OnLongClickListener menu = new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    showContactMenu(c);
+                    if (selecting) {
+                        toggleSelected(c);
+                    } else {
+                        showContactMenu(c);
+                    }
                     return true;
                 }
             };
             row.setOnLongClickListener(menu);
 
-            if (c.hasWork()) {
+            boolean work = c.hasWork();
+            boolean priv = c.hasPrivate();
+            if (work) {
                 h.workText.setText(activity.getString(R.string.contact_work_line,
                         Numbers.formatForDisplay(c.workNumber)));
                 h.workRow.setVisibility(View.VISIBLE);
                 h.workRow.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        callWork(c);
+                        activity.openDialerWith(c.workNumber);
                     }
                 });
                 h.workRow.setOnLongClickListener(menu);
             } else {
                 h.workRow.setVisibility(View.GONE);
                 h.workRow.setOnClickListener(null);
+                h.workRow.setOnLongClickListener(null);
             }
 
-            if (c.hasPrivate()) {
+            if (priv) {
                 h.privateText.setText(activity.getString(R.string.contact_private_line,
                         Numbers.formatForDisplay(c.privateNumber)));
                 h.privateRow.setVisibility(View.VISIBLE);
                 h.privateRow.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        callPrivate(c);
+                        activity.openDialerWith(c.privateNumber);
                     }
                 });
                 h.privateRow.setOnLongClickListener(menu);
             } else {
                 h.privateRow.setVisibility(View.GONE);
                 h.privateRow.setOnClickListener(null);
+                h.privateRow.setOnLongClickListener(null);
             }
+            h.chipGap.setVisibility(work && priv ? View.VISIBLE : View.GONE);
+            h.chipsRow.setVisibility(work || priv ? View.VISIBLE : View.GONE);
+
+            // In selection mode the chips must not take the touch: it goes to the row (toggle).
+            // Set after the listeners above, since setOn(Long)ClickListener makes a view clickable.
+            setChipActive(h.workRow, !selecting && work);
+            setChipActive(h.privateRow, !selecting && priv);
             return row;
+        }
+
+        private void setChipActive(View chip, boolean active) {
+            chip.setEnabled(active);
+            chip.setClickable(active);
+            chip.setLongClickable(active);
+            chip.setFocusable(active);
         }
     }
 }

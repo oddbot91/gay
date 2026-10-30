@@ -1,69 +1,103 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- One phone book entry: bold name, then tappable "Jobb ..." / "Privat ..." rows (gone when empty). -->
+<!-- One phone book entry: bold name, then ONE row with the "Jobb …" and "Privat …" chips side by
+     side (a missing number's chip is GONE and the other takes the full width; the whole chip row
+     is GONE when the contact has no number). Tapping a chip fills in the dial pane.
+     In selection mode a check box is shown on the left; it is not clickable itself, the tap goes
+     to the row (ContactsPane toggles the selection). -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
     android:paddingLeft="@dimen/contact_row_padding_start"
     android:paddingTop="@dimen/row_padding_v"
     android:paddingRight="@dimen/row_padding_h"
     android:paddingBottom="@dimen/row_padding_v">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <CheckBox
+        android:id="@+id/select_box"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingLeft="@dimen/space_tiny"
-        android:paddingRight="@dimen/space_tiny"
-        android:paddingBottom="@dimen/space_tiny">
+        android:layout_marginEnd="@dimen/select_box_gap"
+        android:clickable="false"
+        android:focusable="false"
+        android:importantForAccessibility="no"
+        android:visibility="gone" />
 
-        <TextView
-            android:id="@+id/contact_name"
-            android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:ellipsize="end"
-            android:maxLines="1"
-            android:textColor="?android:attr/textColorPrimary"
-            android:textSize="@dimen/contact_name_text_size"
-            android:textStyle="bold" />
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingLeft="@dimen/space_tiny"
+            android:paddingRight="@dimen/space_tiny"
+            android:paddingBottom="@dimen/space_tiny">
 
-        <ImageView
-            android:id="@+id/favorite_star"
-            android:layout_width="@dimen/favorite_star_size"
-            android:layout_height="@dimen/favorite_star_size"
-            android:layout_marginStart="@dimen/space_small"
-            android:contentDescription="@string/cd_favorite"
-            android:src="@drawable/ic_star"
-            android:tint="@color/accent"
-            android:visibility="gone" />
-    </LinearLayout>
+            <TextView
+                android:id="@+id/contact_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:textColor="?android:attr/textColorPrimary"
+                android:textSize="@dimen/contact_name_text_size"
+                android:textStyle="bold" />
 
-    <LinearLayout
-        android:id="@+id/work_row"
-        style="@style/ContactSubRow">
+            <ImageView
+                android:id="@+id/favorite_star"
+                android:layout_width="@dimen/favorite_star_size"
+                android:layout_height="@dimen/favorite_star_size"
+                android:layout_marginStart="@dimen/space_small"
+                android:contentDescription="@string/cd_favorite"
+                android:src="@drawable/ic_star"
+                android:tint="@color/accent"
+                android:visibility="gone" />
+        </LinearLayout>
 
-        <ImageView
-            style="@style/ContactSubRowIcon"
-            android:src="@drawable/ic_phone_small"
-            android:tint="@color/mode_internal" />
+        <!-- [Jobb …] [Privat …] -->
+        <LinearLayout
+            android:id="@+id/chips_row"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/work_text"
-            style="@style/ContactSubRowText" />
-    </LinearLayout>
+            <LinearLayout
+                android:id="@+id/work_row"
+                style="@style/ContactChip">
 
-    <LinearLayout
-        android:id="@+id/private_row"
-        style="@style/ContactSubRow">
+                <ImageView
+                    style="@style/ContactChipIcon"
+                    android:tint="@color/mode_internal" />
 
-        <ImageView
-            style="@style/ContactSubRowIcon"
-            android:src="@drawable/ic_phone_small"
-            android:tint="@color/mode_private" />
+                <TextView
+                    android:id="@+id/work_text"
+                    style="@style/ContactChipText" />
+            </LinearLayout>
 
-        <TextView
-            android:id="@+id/private_text"
-            style="@style/ContactSubRowText" />
+            <!-- Gap between the chips; GONE unless both chips are shown. -->
+            <View
+                android:id="@+id/chip_gap"
+                android:layout_width="@dimen/chip_gap"
+                android:layout_height="1dp" />
+
+            <LinearLayout
+                android:id="@+id/private_row"
+                style="@style/ContactChip">
+
+                <ImageView
+                    style="@style/ContactChipIcon"
+                    android:tint="@color/mode_private" />
+
+                <TextView
+                    android:id="@+id/private_text"
+                    style="@style/ContactChipText" />
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
 </LinearLayout>
